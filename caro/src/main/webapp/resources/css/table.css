@@ -1,0 +1,45 @@
+@CHARSET "ISO-8859-1";
+#caro_table {
+	width: 630px;
+	height: 600px;
+}
+.table_row {
+	width: 630px;
+	height: 20px;
+	border-top-style: solid;
+	border-top-width: thin;
+	border-color: silver;
+}
+
+.table_cell{
+	width: 20x;
+	height: 20px;
+	border-right-style: solid;
+	border-right-width: thin;
+	border-right-color: silver;
+	display: inline-block;
+}
+
+.user-flag {
+	width: 20px;
+	height: 21px;
+	text-align: center;
+	color: green;
+	display: inline-block;
+	margin-bottom: 1px;
+	margin-left: 0px;
+	margin-right: 0px;
+	margin-top: 0px;
+}
+
+.robot-flag {
+	width: 20px;
+	height: 21px;
+	text-align: center;
+	color: red;
+	display: inline-block;
+	margin-bottom: 1px;
+	margin-left: 0px;
+	margin-right: 0px;
+	margin-top: 0px;
+}
