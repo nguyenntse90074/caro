@@ -2,16 +2,15 @@ package com.tn.caro.bean;
 
 public class Result {
 
-	private int[][] winArr;
+	private Cell[] winRow;
 	private boolean isWin;
 	
 	public Result() {
-		winArr = new int[5][2];
 		isWin = false;
 	}
 	
-	public int[][] getWinArr() {
-		return winArr;
+	public Cell[] getWinRow() {
+		return winRow;
 	}
 	
 	public boolean getIsWin() {
@@ -22,7 +21,7 @@ public class Result {
 		this.isWin = isWin;
 	}
 	
-	public void setWinArr(int[][] winArr) {
-		this.winArr = winArr;
+	public void setWinRow(Cell[] winRow) {
+		this.winRow = winRow;
 	}
 }

@@ -11,8 +11,8 @@ import javax.persistence.Table;
 public class CaroTable {
 	
 	private long tableId;
-	private int[][] tableData;
-	private List<Step> history;
+	private Cell[][] allCell;
+	private List<Cell> history;
 	private boolean userTurns;
 	private int minX;
 	private int minY;
@@ -20,28 +20,104 @@ public class CaroTable {
 	private int maxY;
 	
 	public CaroTable() {
-		history = new ArrayList<Step>();
-		tableData = new int[30][30];
+		history = new ArrayList<Cell>();
+		allCell = new Cell[30][30];
+		Cell[] rowCell = null;
+		for(int y = 0; y < 30; y++) {
+			rowCell = new Cell[30];
+			for(int x = 0; x< 30; x++) {
+				rowCell [x] = new Cell(x, y);
+			}
+			allCell[y] = rowCell;
+		}
 	}
 	
-	public void addNewStep(Step newStep) {
-		history.add(newStep);
-		if(history.size() == 1) {
-			minX = newStep.getX();
-			maxX = newStep.getX();
-			minY = newStep.getY();
-			maxY = newStep.getY();
+	public List<List<Cell>> getAllRowByValue(int value) {
+		List<List<Cell>>allRows = new ArrayList<List<Cell>>();
+		List<Cell> cellsOfRow = null;
+		boolean isValidRow = false;
+		for(int y = 0; y<allCell.length; y++) {
+			cellsOfRow = new ArrayList<Cell>();
+			isValidRow = false;
+			for(int x = 0; x<allCell[y].length; x++) {
+				if(allCell[y][x].getValue() == 0) {
+					cellsOfRow.add(allCell[y][x]);
+				}else if(allCell[y][x].getValue() == value) {
+					isValidRow = true;
+					cellsOfRow.add(allCell[y][x]);
+				} 
+				if(allCell[y][x].getValue() == -value || x == allCell[y].length - 1) {
+					if(isValidRow) {
+						allRows.add(cellsOfRow);
+						isValidRow = false;
+					}
+					cellsOfRow = new ArrayList<Cell>();
+				}
+			}
+		}
+		for(int x = 0; x<allCell[0].length; x++) {
+			cellsOfRow = new ArrayList<Cell>();
+			isValidRow = false;
+			for(int y = 0; y<allCell.length; y++) {
+				if(allCell[y][x].getValue() == 0) {
+					cellsOfRow.add(allCell[y][x]);
+				}else if(allCell[y][x].getValue() == value) {
+					isValidRow = true;
+					cellsOfRow.add(allCell[y][x]);
+				}
+				if(allCell[y][x].getValue() == -value || y == allCell.length - 1) {
+					if(isValidRow) {
+						allRows.add(cellsOfRow);
+						isValidRow = false;
+					}
+					cellsOfRow = new ArrayList<Cell>();
+				}
+			}
+		}
+		return allRows; 
+	}
+	
+	public Cell getLastestCell() {
+		if(history.isEmpty()) {
+			return null;
+		}
+		return history.get(history.size()-1);
+	}
+	
+	public Cell[] getAllCellAtRow(int index) {
+		return allCell[index];
+	}
+	
+	public Cell[] getAllCellAtCollumn(int index) {
+		Cell[] collumnYCells = new Cell[allCell.length];
+		for(int i = 0; i< allCell.length; i++) {
+			collumnYCells[i] = allCell[i][index];
+		}
+		return collumnYCells;
+	}
+	
+	public void checkToCell(Cell cell) {
+		if(allCell[cell.getY()][cell.getX()].getValue() != 0) {
 			return;
 		}
-		if(newStep.getX() < minX) {
-			minX = newStep.getX();
-		} else if(newStep.getX() > maxX) {
-			maxX = newStep.getX();
+		allCell[cell.getY()][cell.getX()].setValue(cell.getValue());
+		history.add(cell);
+		if(history.size() == 1) {
+			minX = cell.getX();
+			maxX = cell.getX();
+			minY = cell.getY();
+			maxY = cell.getY();
+			return;
 		}
-		if(newStep.getY() < minY) {
-			minY = newStep.getY();
-		} else if(newStep.getY() > maxY) {
-			maxY = newStep.getY();
+		if(cell.getX() < minX) {
+			minX = cell.getX();
+		} else if(cell.getX() > maxX) {
+			maxX = cell.getX();
+		}
+		if(cell.getY() < minY) {
+			minY = cell.getY();
+		} else if(cell.getY() > maxY) {
+			maxY = cell.getY();
 		}
 	}
 	
@@ -72,20 +148,7 @@ public class CaroTable {
 	public int getMinY() {
 		return minY;
 	}
-	public int[][] getTableData() {
-		return tableData;
-	}
-
-	public int[][] getMinimizeTableData() {
-		int[][] minimizeTable = new int[maxX - minX + 1][maxY - minY + 1];
-		int x = 0;
-		for(int i = minY; i <= maxY; i++) {
-			int y = 0;
-			for(int j = minX; j <= maxX; j++) {
-				minimizeTable[x][y++] = tableData[i][j];
-			}
-			x++;
-		}
-		return minimizeTable;
+	public Cell[][] getAllCell() {
+		return allCell;
 	}
 }
