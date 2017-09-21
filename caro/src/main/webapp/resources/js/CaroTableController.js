@@ -7,7 +7,7 @@ var user_turns = true;
 $(document).ready(function(){
 	drowTable("#caro_table");
 	$("#caro_table").on("mouseenter", ".table_cell",function() {
-		focusToCell($(this))
+		focusToCell($(this));
 	}).on("mouseout", ".table_cell", function(){
 		disFocusFromCell($(this));
 	}).on("click", ".table_cell", function(){
@@ -25,7 +25,8 @@ function focusToCell(cell) {
 	}
 }
 function disFocusFromCell(cell) {
-	$(cell).css("background-color", "")
+	if(!user_turns) return;
+	$(cell).css("background-color", "");
 }
 
 function userClick (cell) {
@@ -43,9 +44,9 @@ function addUserStep(x, y) {
 	user_turns = false;
 }
 
-function finishGame (winArr) {
-	$.each(winArr, function(index, value) {
-		$("[x="+value[0]+"][y="+value[1]+"]").css("background-color", "blue");
+function finishGame (winRow) {
+	$.each(winRow, function(index, value) {
+		$("[x="+winRow[index].x+"][y="+winRow[index].y+"]").css("background-color", "goldenrod");
 	});
 }
 
@@ -55,9 +56,11 @@ function submitUserStep(x, y) {
 		url: "add-user-step?tableId=" + tableId + "&x=" + x + "&y=" + y,
 		dataType: "json",
 		success: function(response) {
-			addUserStep(response.newStep.x, response.newStep.y);
+			addUserStep(response.cell.x, response.cell.y);
 			if(response.result.isWin) {
-				finishGame(response.result.winArr);
+				finishGame(response.result.winRow);
+				user_turns = false;
+				setTimeout(alert("You are win"), 1000);
 			} else {
 				requestRobotStep();
 			}
@@ -71,11 +74,16 @@ function submitUserStep(x, y) {
 function requestRobotStep() {
 	$.ajax({
 		type: "GET",
-		url: "request-robot-step",
+		url: "request-robot-step?tableId="+tableId,
 		dataType: "json",
 		success: function(response) {
-			addRobotStep(response.newStep.x, response.newStep.y);
-			finishGame(response.result.winArr);
+			addRobotStep(response.cell.x, response.cell.y);
+			if(response.result.isWin) {
+				finishGame(response.result.winRow);
+				alert("Doraemon win");
+			} else {
+				user_turns = true;
+			}
 		},
 		error: function(response) {
         	console.log(response);
@@ -107,14 +115,14 @@ function drowTable(tableDiv) {
 	var TABLE_ROW = 30;
 	var TABLE_COLLUMN = 30;
 	var tableHTML = "";
-	for(var i = 0; i< TABLE_ROW; i++) {
-		var b = [];
+	for(var y = 0; y < TABLE_ROW; y++) {
+		var rowCell = [];
 		tableHTML += "<div class='table_row'>";
-		for(var j = 0; j< TABLE_COLLUMN; j++) {
-			b[j] = 0;
-			tableHTML += "<div class='table_cell' style='width: 20px' x="+i+" y="+j+"></div>";
+		for(var x = 0; x< TABLE_COLLUMN; x++) {
+			rowCell[x] = 0;
+			tableHTML += "<div class='table_cell' style='width: 20px' x="+x+" y="+y+"></div>";
 		}
-		tableData[i] = b;
+		tableData[y] = rowCell;
 		tableHTML += "</div>";
 	}
 	$(tableDiv).append(tableHTML);

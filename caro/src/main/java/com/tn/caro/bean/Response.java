@@ -1,10 +1,17 @@
 package com.tn.caro.bean;
 
 public class Response {
+	
+	public static final int STATUS_OK = 0;
+	public static final int STATUS_ERR = 1;
+	
 	private Result result;
-	private Step newStep;
+	private Cell cell;
+	private int status;
+	private String message;
 	
 	public Response() {
+		status = STATUS_OK;
 		result = new Result();
 	}
 	
@@ -12,15 +19,31 @@ public class Response {
 		this.result = result;
 	}
 	
-	public void setNewStep(Step newStep) {
-		this.newStep = newStep;
+	public void setCell(Cell cell) {
+		this.cell = cell;
 	}
 	
 	public Result getResult() {
 		return result;
 	}
 	
-	public Step getNewStep() {
-		return newStep;
+	public Cell getCell() {
+		return cell;
+	}
+	
+	public void setStatus(int status) {
+		this.status = status;
+	}
+	
+	public int getStatus() {
+		return status;
+	}
+	
+	public String getMessage() {
+		return message;
+	}
+	
+	public void setMessage(String message) {
+		this.message = message;
 	}
 }
