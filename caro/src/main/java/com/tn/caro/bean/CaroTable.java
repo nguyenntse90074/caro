@@ -1,5 +1,7 @@
 package com.tn.caro.bean;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +12,9 @@ import javax.persistence.Table;
 @Table(name = "caro_table", schema="caro_data")
 public class CaroTable {
 	
+	public static final int ROW = 30;
+	public static final int COLLUMN = 30;
+	
 	private long tableId;
 	private Cell[][] allCell;
 	private List<Cell> history;
@@ -18,10 +23,13 @@ public class CaroTable {
 	private int minY;
 	private int maxX;
 	private int maxY;
+	private boolean isFinished;
+	private LocalDateTime lastUpdated;
 	
 	public CaroTable() {
+		isFinished = false;
 		history = new ArrayList<Cell>();
-		allCell = new Cell[30][30];
+		allCell = new Cell[COLLUMN][ROW];
 		Cell[] rowCell = null;
 		for(int y = 0; y < 30; y++) {
 			rowCell = new Cell[30];
@@ -30,26 +38,31 @@ public class CaroTable {
 			}
 			allCell[y] = rowCell;
 		}
+		lastUpdated = LocalDateTime.now();
 	}
 	
 	public List<List<Cell>> getAllRowByValue(int value) {
 		List<List<Cell>>allRows = new ArrayList<List<Cell>>();
 		List<Cell> cellsOfRow = null;
-		boolean isValidRow = false;
+		List<Cell> tailList = null;
+		boolean hasValue = false;
+		boolean isFirstRow = true;
 		for(int y = 0; y<allCell.length; y++) {
 			cellsOfRow = new ArrayList<Cell>();
-			isValidRow = false;
+			tailList = new ArrayList<Cell>();
+			hasValue = false;
+			isFirstRow = true;
 			for(int x = 0; x<allCell[y].length; x++) {
 				if(allCell[y][x].getValue() == 0) {
 					cellsOfRow.add(allCell[y][x]);
-				}else if(allCell[y][x].getValue() == value) {
-					isValidRow = true;
+				} else if(allCell[y][x].getValue() == value) {
+					hasValue = true;
 					cellsOfRow.add(allCell[y][x]);
 				} 
 				if(allCell[y][x].getValue() == -value || x == allCell[y].length - 1) {
-					if(isValidRow) {
+					if(hasValue) {
 						allRows.add(cellsOfRow);
-						isValidRow = false;
+						hasValue = false;
 					}
 					cellsOfRow = new ArrayList<Cell>();
 				}
@@ -57,23 +70,105 @@ public class CaroTable {
 		}
 		for(int x = 0; x<allCell[0].length; x++) {
 			cellsOfRow = new ArrayList<Cell>();
-			isValidRow = false;
+			hasValue = false;
 			for(int y = 0; y<allCell.length; y++) {
 				if(allCell[y][x].getValue() == 0) {
 					cellsOfRow.add(allCell[y][x]);
 				}else if(allCell[y][x].getValue() == value) {
-					isValidRow = true;
+					hasValue = true;
 					cellsOfRow.add(allCell[y][x]);
 				}
 				if(allCell[y][x].getValue() == -value || y == allCell.length - 1) {
-					if(isValidRow) {
+					if(hasValue) {
 						allRows.add(cellsOfRow);
-						isValidRow = false;
+						hasValue = false;
 					}
 					cellsOfRow = new ArrayList<Cell>();
 				}
 			}
 		}
+		for(int i = 0; i < allCell.length; i++) {
+			cellsOfRow = new ArrayList<Cell>();
+			hasValue = false;
+			for(int x = 0; x < allCell.length - i; x++) {
+				int y = x + i;
+				if(allCell[y][x].getValue() == 0) {
+					cellsOfRow.add(allCell[y][x]);
+				}else if(allCell[y][x].getValue() == value) {
+					hasValue = true;
+					cellsOfRow.add(allCell[y][x]);
+				}
+				if(allCell[y][x].getValue() == -value || x == allCell.length - i - 1) {
+					if(hasValue) {
+						allRows.add(cellsOfRow);
+						hasValue = false;
+					}
+					cellsOfRow = new ArrayList<Cell>();
+				}
+			}
+		}
+		for(int i = 1; i < allCell.length; i++) {
+			cellsOfRow = new ArrayList<Cell>();
+			hasValue = false;
+			for(int x = i; x < allCell.length; x++) {
+				int y = x - i;
+				if(allCell[y][x].getValue() == 0) {
+					cellsOfRow.add(allCell[y][x]);
+				}else if(allCell[y][x].getValue() == value) {
+					hasValue = true;
+					cellsOfRow.add(allCell[y][x]);
+				}
+				if(allCell[y][x].getValue() == -value || x == allCell.length - 1) {
+					if(hasValue) {
+						allRows.add(cellsOfRow);
+						hasValue = false;
+					}
+					cellsOfRow = new ArrayList<Cell>();
+				}
+			}
+		}
+		for(int i = 0; i < allCell.length; i++) {
+			cellsOfRow = new ArrayList<Cell>();
+			hasValue = false;
+			for(int x = 0; x <= i; x++) {
+				int y = -x + i;
+				if(allCell[y][x].getValue() == 0) {
+					cellsOfRow.add(allCell[y][x]);
+				}else if(allCell[y][x].getValue() == value) {
+					hasValue = true;
+					cellsOfRow.add(allCell[y][x]);
+				}
+				if(allCell[y][x].getValue() == -value || x == i) {
+					if(hasValue) {
+						allRows.add(cellsOfRow);
+						hasValue = false;
+					}
+					cellsOfRow = new ArrayList<Cell>();
+				}
+			}
+		}
+		
+		for(int i = allCell.length; i < allCell.length * 2; i++) {
+			cellsOfRow = new ArrayList<Cell>();
+			hasValue = false;
+			for(int x = i - allCell.length + 1; x < allCell.length; x++) {
+				int y = -x + i;
+				if(allCell[y][x].getValue() == 0) {
+					cellsOfRow.add(allCell[y][x]);
+				}else if(allCell[y][x].getValue() == value) {
+					hasValue = true;
+					cellsOfRow.add(allCell[y][x]);
+				}
+				if(allCell[y][x].getValue() == -value || x == allCell.length - 1) {
+					if(hasValue) {
+						allRows.add(cellsOfRow);
+						hasValue = false;
+					}
+					cellsOfRow = new ArrayList<Cell>();
+				}
+			}
+		}
+		
 		return allRows; 
 	}
 	
@@ -84,16 +179,105 @@ public class CaroTable {
 		return history.get(history.size()-1);
 	}
 	
-	public Cell[] getAllCellAtRow(int index) {
-		return allCell[index];
-	}
-	
-	public Cell[] getAllCellAtCollumn(int index) {
-		Cell[] collumnYCells = new Cell[allCell.length];
-		for(int i = 0; i< allCell.length; i++) {
-			collumnYCells[i] = allCell[i][index];
+	public List<Cell> findWinRowsByCell(Cell cell) {
+		List<Cell> winRow = new ArrayList<Cell>();
+		winRow.add(cell);
+		for(int index = cell.getX()+1; index < allCell[cell.getY()].length; index++) {
+			if(allCell[cell.getY()][index].getValue() == cell.getValue()) {
+				winRow.add(allCell[cell.getY()][index]);
+				if(winRow.size() >= 5) {
+					isFinished = true;
+					return winRow;
+				}
+			} else {
+				break;
+			}
 		}
-		return collumnYCells;
+		for(int index = cell.getX()-1; index >=0; index--) {
+			if(allCell[cell.getY()][index].getValue() == cell.getValue()) {
+				winRow.add(allCell[cell.getY()][index]);
+				if(winRow.size() >= 5) {
+					isFinished = true;
+					return winRow;
+				}
+			} else {
+				break;
+			}
+		}
+		winRow.clear();
+		winRow.add(cell);
+		for(int index = cell.getY()+1; index < allCell.length; index++) {
+			if(allCell[index][cell.getX()].getValue() == cell.getValue()) {
+				winRow.add(allCell[index][cell.getX()]);
+				if(winRow.size() >= 5) {
+					isFinished = true;
+					return winRow;
+				}
+			} else {
+				break;
+			}
+		}
+		for(int index = cell.getY()-1; index >=0; index--) {
+			if(allCell[index][cell.getX()].getValue() == cell.getValue()) {
+				winRow.add(allCell[index][cell.getX()]);
+				if(winRow.size() >= 5) {
+					isFinished = true;
+					return winRow;
+				}
+			} else {
+				break;
+			}
+		}
+		winRow.clear();
+		winRow.add(cell);
+		for(int indexX = cell.getX()+1, indexY = cell.getY()+1; indexX < allCell.length && indexY < allCell.length; indexX++, indexY++) {
+			if(allCell[indexY][indexX].getValue() == cell.getValue()) {
+				winRow.add(allCell[indexY][indexX]);
+				if(winRow.size() >= 5) {
+					isFinished = true;
+					return winRow;
+				}
+			} else {
+				break;
+			}
+		}
+		for(int indexX = cell.getX()-1, indexY = cell.getY()-1; indexX >= 0 && indexY >= 0; indexX--, indexY--) {
+			if(allCell[indexY][indexX].getValue() == cell.getValue()) {
+				winRow.add(allCell[indexY][indexX]);
+				if(winRow.size() >= 5) {
+					isFinished = true;
+					return winRow;
+				}
+			} else {
+				break;
+			}
+		}
+		winRow.clear();
+		winRow.add(cell);
+		for(int indexX = cell.getX()-1, indexY = cell.getY()+1; indexX >= 0 && indexY < allCell.length; indexX--, indexY++) {
+			if(allCell[indexY][indexX].getValue() == cell.getValue()) {
+				winRow.add(allCell[indexY][indexX]);
+				if(winRow.size() >= 5) {
+					isFinished = true;
+					return winRow;
+				}
+			} else {
+				break;
+			}
+		}
+		for(int indexX = cell.getX()+1, indexY = cell.getY()-1; indexX < allCell.length && indexY >= 0; indexX++, indexY--) {
+			if(allCell[indexY][indexX].getValue() == cell.getValue()) {
+				winRow.add(allCell[indexY][indexX]);
+				if(winRow.size() >= 5) {
+					isFinished = true;
+					return winRow;
+				}
+			} else {
+				break;
+			}
+		}
+		winRow.clear();
+		return winRow;
 	}
 	
 	public void checkToCell(Cell cell) {
@@ -119,6 +303,7 @@ public class CaroTable {
 		} else if(cell.getY() > maxY) {
 			maxY = cell.getY();
 		}
+		lastUpdated = LocalDateTime.now();
 	}
 	
 	public long getTableId() {
@@ -150,5 +335,9 @@ public class CaroTable {
 	}
 	public Cell[][] getAllCell() {
 		return allCell;
+	}
+	
+	public boolean isOutOfDate() {
+		return isFinished || LocalDateTime.now().until(lastUpdated, ChronoUnit.MINUTES) > 1;
 	}
 }

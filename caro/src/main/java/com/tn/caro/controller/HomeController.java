@@ -35,7 +35,7 @@ public class HomeController {
 							@RequestParam(required=true) int y){
 		Response response = new Response();
 		CaroTable caroTable = null;
-		if((caroTable = tableManager.getTableById(tableId)) == null) {
+		if((caroTable = tableManager.getTableById(tableId)) == null || caroTable.isOutOfDate()) {
 			response.setStatus(Response.STATUS_ERR);
 			response.setMessage("This table's session is invalid, Refresh page?");
 			return new ResponseEntity<Response>(response, HttpStatus.OK);

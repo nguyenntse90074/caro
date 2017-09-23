@@ -4,12 +4,15 @@
 var tableData = [];
 var tableId;
 var user_turns = true;
+var isFinished = false;
+
 $(document).ready(function(){
-	drowTable("#caro_table");
 	$("#caro_table").on("mouseenter", ".table_cell",function() {
 		focusToCell($(this));
 	}).on("mouseout", ".table_cell", function(){
-		disFocusFromCell($(this));
+		disfocusFromCell($(this));
+	}).on("mouseleave", ".table_cell", function(){
+		disfocusFromCell($(this));
 	}).on("click", ".table_cell", function(){
 		userClick($(this));
 	});
@@ -24,7 +27,7 @@ function focusToCell(cell) {
 		$(cell).css("background-color", "yellow");
 	}
 }
-function disFocusFromCell(cell) {
+function disfocusFromCell(cell) {
 	if(!user_turns) return;
 	$(cell).css("background-color", "");
 }
@@ -40,8 +43,8 @@ function userClick (cell) {
 
 function addUserStep(x, y) {
 	tableData[x][y] = 1;
-	$("[x="+x+"][y="+y+"]").html("<p class='user-flag'>X</p>");
 	user_turns = false;
+	$("[x="+x+"][y="+y+"]").html("<p class='user-flag'>X</p>");
 }
 
 function finishGame (winRow) {
@@ -59,8 +62,11 @@ function submitUserStep(x, y) {
 			addUserStep(response.cell.x, response.cell.y);
 			if(response.result.isWin) {
 				finishGame(response.result.winRow);
-				user_turns = false;
-				setTimeout(alert("You are win"), 1000);
+				setTimeout(function(){
+					alert("You are win.");
+					isFinished = true;
+					registerTable();
+				}, 2000);
 			} else {
 				requestRobotStep();
 			}
@@ -80,7 +86,11 @@ function requestRobotStep() {
 			addRobotStep(response.cell.x, response.cell.y);
 			if(response.result.isWin) {
 				finishGame(response.result.winRow);
-				alert("Doraemon win");
+				setTimeout(function(){
+					alert("Robot are win.");
+					isFinished = true;
+					registerTable();
+				}, 2000);
 			} else {
 				user_turns = true;
 			}
@@ -97,7 +107,9 @@ function registerTable() {
 		url: "register-table",
 		dataType: "text",
 		success: function(response) {
-			tableId = Number(response);
+			tableId = response;
+			isFinished = false;
+			resetTable();
 		},
 		error: function(response) {
 			console.log(response);
@@ -108,12 +120,12 @@ function registerTable() {
 function addRobotStep(x, y) {
 	tableData[x][y] = -1;
 	$("[x="+x+"][y="+y+"]").html("<p class='robot-flag'>O</p>");
-	user_turns = true;
 }
 
 function drowTable(tableDiv) {
 	var TABLE_ROW = 30;
 	var TABLE_COLLUMN = 30;
+	tableData = []
 	var tableHTML = "";
 	for(var y = 0; y < TABLE_ROW; y++) {
 		var rowCell = [];
@@ -125,5 +137,10 @@ function drowTable(tableDiv) {
 		tableData[y] = rowCell;
 		tableHTML += "</div>";
 	}
-	$(tableDiv).append(tableHTML);
+	$(tableDiv).html(tableHTML);
+}
+
+function resetTable() {
+	drowTable("#caro_table");
+	user_turns = true;
 }

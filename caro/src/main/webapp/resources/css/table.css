@@ -1,7 +1,25 @@
 @CHARSET "ISO-8859-1";
+
+#user_panel {
+	width: 315px;
+	height: 600px;
+	display: inline-block;
+}
+#robot_panel {
+	width: 315px;
+	height: 600px;
+	display: inline-block;
+}
 #caro_table {
 	width: 630px;
-	height: 600px;
+	height: 630px;
+	display: inline-block;
+	border-bottom-style: solid;
+	border-bottom-width: thin;
+	border-bottom-color: silver;
+	border-left-style: solid;
+	border-left-width: thin;
+	border-left-color: silver;
 }
 .table_row {
 	width: 630px;
@@ -42,4 +60,10 @@
 	margin-left: 0px;
 	margin-right: 0px;
 	margin-top: 0px;
+}
+
+.avatar {
+	display: inline;
+	width: 200px;
+	height: 200px;
 }
