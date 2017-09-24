@@ -35,6 +35,10 @@ public class TableManager {
 		return allTables.get(id);
 	}
 	
+	public void deleteTableById(long id) {
+		allTables.remove(id);
+	}
+	
 	public void deleteOutOfDateTable() {
 		int i = 0;
 		for(CaroTable table : allTables.values()) {
@@ -43,7 +47,6 @@ public class TableManager {
 				i++;
 			}
 		}
-		System.out.println("Deteled " + i + "tables");
 	}
 }
 

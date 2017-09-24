@@ -44,6 +44,9 @@ public class HomeController {
 		caroTable.checkToCell(userCell);
 		response.setCell(userCell);
 		response.setResult(caroService.checkResult(userCell, caroTable));
+		if(response.getResult().getIsWin()) {
+			tableManager.deleteTableById(tableId);
+		}
 		return new ResponseEntity<Response>(response, HttpStatus.OK);
 	}
 	
@@ -56,6 +59,9 @@ public class HomeController {
 		caroTable.checkToCell(robotCell);
 		response.setCell(robotCell);
 		response.setResult(caroService.checkResult(robotCell, caroTable));
+		if(response.getResult().getIsWin()) {
+			tableManager.deleteTableById(tableId);
+		}
 		return new ResponseEntity<Response>(response, HttpStatus.OK);
 	}
 }
