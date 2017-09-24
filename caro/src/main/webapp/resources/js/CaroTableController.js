@@ -66,7 +66,7 @@ function submitUserStep(x, y) {
 					alert("You are win.");
 					isFinished = true;
 					registerTable();
-				}, 2000);
+				}, 1000);
 			} else {
 				requestRobotStep();
 			}
@@ -90,7 +90,7 @@ function requestRobotStep() {
 					alert("Robot are win.");
 					isFinished = true;
 					registerTable();
-				}, 2000);
+				}, 1000);
 			} else {
 				user_turns = true;
 			}
@@ -127,16 +127,23 @@ function drowTable(tableDiv) {
 	var TABLE_COLLUMN = 30;
 	tableData = []
 	var tableHTML = "";
-	for(var y = 0; y < TABLE_ROW; y++) {
+	for(var y = TABLE_ROW -1; y >= 0; y--) {
 		var rowCell = [];
 		tableHTML += "<div class='table_row'>";
-		for(var x = 0; x< TABLE_COLLUMN; x++) {
+		tableHTML += "<div class='row_title' style='width: 20px'>" + y + "</div>";
+		for(var x = 0; x < TABLE_ROW; x++) {
 			rowCell[x] = 0;
 			tableHTML += "<div class='table_cell' style='width: 20px' x="+x+" y="+y+"></div>";
 		}
 		tableData[y] = rowCell;
 		tableHTML += "</div>";
 	}
+	tableHTML += "<div class='table_row'>";
+	tableHTML += "<div class='row_title' style='width: 20px'></div>";
+	for(var x = 0; x < TABLE_ROW; x++) {
+		tableHTML += "<div class='collumn_title' style='width: 20px'>"+x+"</div>";
+	}
+	tableHTML += "</div>";
 	$(tableDiv).html(tableHTML);
 }
 
