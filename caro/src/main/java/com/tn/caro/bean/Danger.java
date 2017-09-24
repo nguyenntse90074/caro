@@ -4,23 +4,36 @@ public class Danger implements Comparable<Danger> {
 
 	public static final int LEVEL_RED = 4;
 	public static final int LEVEL_YELLOW = 3;
-	public static final int LEVEL_SILVER = 2;
+	public static final int LEVEL_GREEN = 2;
 	public static final int LEVEL_NORMAL = 1;
+	public static final int LEVEL_WHITE = 0;
 	private Cell cell;
 	private int rate;
+	private int positionPriority;
 	private int level;
+	private int emptyHead;
 	
-	public Danger(Cell cell, int level, int rate) {
+	public Danger(Cell cell, int level, int rate, int positionPiority, int emptyHead) {
 		this.cell = cell;
 		this.rate = rate;
 		this.level = level;
+		this.positionPriority = positionPiority;
+		this.emptyHead = emptyHead;
 	}
 
 	public int compareTo(Danger o) {
-		if(this.level == o.getLevel()) {
-			return o.getRate() - this.rate;
+		if(this.level != o.getLevel()) {
+			return o.getLevel() - this.getLevel();
 		}
-		return o.getLevel() - this.getLevel();
+		if(this.level >= LEVEL_GREEN) {
+			if(o.getPositionPriority() != this.getPositionPriority()) {
+				return o.getPositionPriority() - this.getPositionPriority();
+			}
+		}
+		if(this.rate != o.getRate()) {
+			return o.getRate() - this.getRate();
+		}
+		return o.getEmptyHead() - this.getEmptyHead();
 	}
 	
 	public int getRate() {
@@ -37,6 +50,14 @@ public class Danger implements Comparable<Danger> {
 	
 	public void setLevel(int level) {
 		this.level = level;
+	}
+	
+	public int getEmptyHead() {
+		return emptyHead;
+	}
+	
+	public int getPositionPriority() {
+		return positionPriority;
 	}
 	
 	@Override
