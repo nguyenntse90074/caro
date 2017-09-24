@@ -46,125 +46,266 @@ public class CaroTable {
 		List<Cell> cellsOfRow = null;
 		List<Cell> tailList = null;
 		boolean hasValue = false;
-		boolean isFirstRow = true;
+		Cell checkingCell;
 		for(int y = 0; y<allCell.length; y++) {
 			cellsOfRow = new ArrayList<Cell>();
 			tailList = new ArrayList<Cell>();
 			hasValue = false;
-			isFirstRow = true;
 			for(int x = 0; x<allCell[y].length; x++) {
-				if(allCell[y][x].getValue() == 0) {
-					cellsOfRow.add(allCell[y][x]);
-				} else if(allCell[y][x].getValue() == value) {
+				checkingCell = allCell[y][x];
+				if(checkingCell.getValue() == 0) {
+					if(hasValue) {
+						tailList.add(checkingCell);
+						if(tailList.size() < 2) {
+							cellsOfRow.add(checkingCell);
+						}
+					} else {
+						cellsOfRow.add(checkingCell);
+					}
+				} else if(checkingCell.getValue() == value) {
+					cellsOfRow.add(checkingCell);
 					hasValue = true;
-					cellsOfRow.add(allCell[y][x]);
-				} 
-				if(allCell[y][x].getValue() == -value || x == allCell[y].length - 1) {
+					tailList.clear();
+				} else if(checkingCell.getValue() == -value 
+						|| x == allCell[y].length - 1) {
+					if(hasValue) {
+						if(!tailList.isEmpty()) {
+							cellsOfRow.addAll(tailList);
+						}
+						allRows.add(cellsOfRow);
+					}
+					hasValue = false;
+					tailList.clear();
+					cellsOfRow = new ArrayList<Cell>();
+				}
+				if(tailList.size() == 2) {
 					if(hasValue) {
 						allRows.add(cellsOfRow);
-						hasValue = false;
 					}
+					hasValue = false;
 					cellsOfRow = new ArrayList<Cell>();
+					cellsOfRow.addAll(tailList);
+					tailList.clear();
 				}
 			}
 		}
 		for(int x = 0; x<allCell[0].length; x++) {
 			cellsOfRow = new ArrayList<Cell>();
+			tailList = new ArrayList<Cell>();
 			hasValue = false;
 			for(int y = 0; y<allCell.length; y++) {
-				if(allCell[y][x].getValue() == 0) {
-					cellsOfRow.add(allCell[y][x]);
-				}else if(allCell[y][x].getValue() == value) {
-					hasValue = true;
-					cellsOfRow.add(allCell[y][x]);
-				}
-				if(allCell[y][x].getValue() == -value || y == allCell.length - 1) {
+				checkingCell = allCell[y][x];
+				if(checkingCell.getValue() == 0) {
 					if(hasValue) {
-						allRows.add(cellsOfRow);
-						hasValue = false;
+						tailList.add(checkingCell);
+						if(tailList.size() < 2) {
+							cellsOfRow.add(checkingCell);
+						}
+					} else {
+						cellsOfRow.add(checkingCell);
 					}
+				} else if(checkingCell.getValue() == value) {
+					cellsOfRow.add(checkingCell);
+					hasValue = true;
+					tailList.clear();
+				} else if(checkingCell.getValue() == -value 
+						|| y == allCell.length - 1) {
+					if(hasValue) {
+						if(!tailList.isEmpty()) {
+							cellsOfRow.addAll(tailList);
+						}
+						allRows.add(cellsOfRow);
+					}
+					hasValue = false;
+					tailList.clear();
 					cellsOfRow = new ArrayList<Cell>();
+				}
+				if(tailList.size() == 2) {
+					if(hasValue) {
+						cellsOfRow.addAll(tailList);
+						allRows.add(cellsOfRow);
+					}
+					hasValue = false;
+					cellsOfRow = new ArrayList<Cell>();
+					cellsOfRow.addAll(tailList);
+					tailList.clear();
 				}
 			}
 		}
 		for(int i = 0; i < allCell.length; i++) {
 			cellsOfRow = new ArrayList<Cell>();
+			tailList = new ArrayList<Cell>();
 			hasValue = false;
 			for(int x = 0; x < allCell.length - i; x++) {
 				int y = x + i;
-				if(allCell[y][x].getValue() == 0) {
-					cellsOfRow.add(allCell[y][x]);
-				}else if(allCell[y][x].getValue() == value) {
-					hasValue = true;
-					cellsOfRow.add(allCell[y][x]);
-				}
-				if(allCell[y][x].getValue() == -value || x == allCell.length - i - 1) {
+				checkingCell = allCell[y][x];
+				if(checkingCell.getValue() == 0) {
 					if(hasValue) {
-						allRows.add(cellsOfRow);
-						hasValue = false;
+						tailList.add(checkingCell);
+						if(tailList.size() < 2) {
+							cellsOfRow.add(checkingCell);
+						}
+					} else {
+						cellsOfRow.add(checkingCell);
 					}
+				} else if(checkingCell.getValue() == value) {
+					cellsOfRow.add(checkingCell);
+					hasValue = true;
+					tailList.clear();
+				} else if(checkingCell.getValue() == -value 
+						|| x == allCell[y].length - i - 1) {
+					if(hasValue) {
+						if(!tailList.isEmpty()) {
+							cellsOfRow.addAll(tailList);
+						}
+						allRows.add(cellsOfRow);
+					}
+					hasValue = false;
+					tailList.clear();
 					cellsOfRow = new ArrayList<Cell>();
+				}
+				if(tailList.size() == 2) {
+					if(hasValue) {
+						cellsOfRow.addAll(tailList);
+						allRows.add(cellsOfRow);
+					}
+					hasValue = false;
+					cellsOfRow = new ArrayList<Cell>();
+					cellsOfRow.addAll(tailList);
+					tailList.clear();
 				}
 			}
 		}
 		for(int i = 1; i < allCell.length; i++) {
 			cellsOfRow = new ArrayList<Cell>();
+			tailList = new ArrayList<Cell>();
 			hasValue = false;
 			for(int x = i; x < allCell.length; x++) {
 				int y = x - i;
-				if(allCell[y][x].getValue() == 0) {
-					cellsOfRow.add(allCell[y][x]);
-				}else if(allCell[y][x].getValue() == value) {
-					hasValue = true;
-					cellsOfRow.add(allCell[y][x]);
-				}
-				if(allCell[y][x].getValue() == -value || x == allCell.length - 1) {
+				checkingCell = allCell[y][x];
+				if(checkingCell.getValue() == 0) {
 					if(hasValue) {
-						allRows.add(cellsOfRow);
-						hasValue = false;
+						tailList.add(checkingCell);
+						if(tailList.size() < 2) {
+							cellsOfRow.add(checkingCell);
+						}
+					} else {
+						cellsOfRow.add(checkingCell);
 					}
+				} else if(checkingCell.getValue() == value) {
+					cellsOfRow.add(checkingCell);
+					hasValue = true;
+					tailList.clear();
+				} else if(checkingCell.getValue() == -value 
+						|| x == allCell.length - 1) {
+					if(hasValue) {
+						if(!tailList.isEmpty()) {
+							cellsOfRow.addAll(tailList);
+						}
+						allRows.add(cellsOfRow);
+					}
+					hasValue = false;
+					tailList.clear();
 					cellsOfRow = new ArrayList<Cell>();
+				}
+				if(tailList.size() == 2) {
+					if(hasValue) {
+						cellsOfRow.addAll(tailList);
+						allRows.add(cellsOfRow);
+					}
+					hasValue = false;
+					cellsOfRow = new ArrayList<Cell>();
+					cellsOfRow.addAll(tailList);
+					tailList.clear();
 				}
 			}
 		}
 		for(int i = 0; i < allCell.length; i++) {
 			cellsOfRow = new ArrayList<Cell>();
+			tailList = new ArrayList<Cell>();
 			hasValue = false;
 			for(int x = 0; x <= i; x++) {
 				int y = -x + i;
-				if(allCell[y][x].getValue() == 0) {
-					cellsOfRow.add(allCell[y][x]);
-				}else if(allCell[y][x].getValue() == value) {
-					hasValue = true;
-					cellsOfRow.add(allCell[y][x]);
-				}
-				if(allCell[y][x].getValue() == -value || x == i) {
+				checkingCell = allCell[y][x];
+				if(checkingCell.getValue() == 0) {
 					if(hasValue) {
-						allRows.add(cellsOfRow);
-						hasValue = false;
+						tailList.add(checkingCell);
+						if(tailList.size() < 2) {
+							cellsOfRow.add(checkingCell);
+						}
+					} else {
+						cellsOfRow.add(checkingCell);
 					}
+				} else if(checkingCell.getValue() == value) {
+					cellsOfRow.add(checkingCell);
+					hasValue = true;
+					tailList.clear();
+				} else if(checkingCell.getValue() == -value 
+						|| x == i) {
+					if(hasValue) {
+						if(!tailList.isEmpty()) {
+							cellsOfRow.addAll(tailList);
+						}
+						allRows.add(cellsOfRow);
+					}
+					hasValue = false;
+					tailList.clear();
 					cellsOfRow = new ArrayList<Cell>();
+				}
+				if(tailList.size() == 2) {
+					if(hasValue) {
+						cellsOfRow.addAll(tailList);
+						allRows.add(cellsOfRow);
+					}
+					hasValue = false;
+					cellsOfRow = new ArrayList<Cell>();
+					cellsOfRow.addAll(tailList);
+					tailList.clear();
 				}
 			}
 		}
 		
 		for(int i = allCell.length; i < allCell.length * 2; i++) {
 			cellsOfRow = new ArrayList<Cell>();
+			tailList = new ArrayList<Cell>();
 			hasValue = false;
 			for(int x = i - allCell.length + 1; x < allCell.length; x++) {
 				int y = -x + i;
-				if(allCell[y][x].getValue() == 0) {
-					cellsOfRow.add(allCell[y][x]);
-				}else if(allCell[y][x].getValue() == value) {
-					hasValue = true;
-					cellsOfRow.add(allCell[y][x]);
-				}
-				if(allCell[y][x].getValue() == -value || x == allCell.length - 1) {
+				checkingCell = allCell[y][x];
+				if(checkingCell.getValue() == 0) {
 					if(hasValue) {
-						allRows.add(cellsOfRow);
-						hasValue = false;
+						tailList.add(checkingCell);
+						if(tailList.size() < 2) {
+							cellsOfRow.add(checkingCell);
+						}
+					} else {
+						cellsOfRow.add(checkingCell);
 					}
+				} else if(checkingCell.getValue() == value) {
+					cellsOfRow.add(checkingCell);
+					hasValue = true;
+					tailList.clear();
+				} else if(checkingCell.getValue() == -value 
+						|| x == allCell.length - 1) {
+					if(hasValue) {
+						if(!tailList.isEmpty()) {
+							cellsOfRow.addAll(tailList);
+						}
+						allRows.add(cellsOfRow);
+					}
+					hasValue = false;
+					tailList.clear();
 					cellsOfRow = new ArrayList<Cell>();
+				}
+				if(tailList.size() == 2) {
+					if(hasValue) {
+						cellsOfRow.addAll(tailList);
+						allRows.add(cellsOfRow);
+					}
+					hasValue = false;
+					cellsOfRow = new ArrayList<Cell>();
+					cellsOfRow.addAll(tailList);
+					tailList.clear();
 				}
 			}
 		}
