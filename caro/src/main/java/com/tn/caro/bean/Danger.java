@@ -5,8 +5,9 @@ public class Danger implements Comparable<Danger> {
 	public static final int LEVEL_RED = 4;
 	public static final int LEVEL_YELLOW = 3;
 	public static final int LEVEL_GREEN = 2;
-	public static final int LEVEL_NORMAL = 1;
-	public static final int LEVEL_WHITE = 0;
+	public static final int LEVEL_WHITE = 1;
+	public static final int LEVEL_NORMAL = 0;
+	
 	private Cell cell;
 	private int rate;
 	private int positionPriority;
@@ -32,6 +33,9 @@ public class Danger implements Comparable<Danger> {
 		}
 		if(this.rate != o.getRate()) {
 			return o.getRate() - this.getRate();
+		}
+		if(o.getPositionPriority() != this.getPositionPriority()) {
+			return o.getPositionPriority() - this.getPositionPriority();
 		}
 		return o.getEmptyHead() - this.getEmptyHead();
 	}

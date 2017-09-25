@@ -2,7 +2,9 @@ package com.tn.caro.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -68,32 +70,11 @@ public class CaroService {
 					}
 				}
 			}
+			
 			Collections.sort(allUserYellowDanger);
 			return allUserYellowDanger.get(0).getCell();
 		}
-		
-		List<Danger> allRobotYellowDanger = findDangerByLevel(Danger.LEVEL_YELLOW, allRobotDanger);
-		if(!allRobotYellowDanger.isEmpty()) {
-			Danger dangerLv1;
-			for(int i = 0; i<allRobotYellowDanger.size(); i++) {
-				dangerLv1 = allRobotYellowDanger.get(i);
-				for(int j=0; j<allRobotDanger.size(); j++) {
-					if(i!=j && dangerLv1.equals(allRobotDanger.get(j))) {
-						dangerLv1.augmentRate(allRobotDanger.get(j).getRate());
-					}
-				}
-			}
-			for(Danger robotYellowDanger : allRobotYellowDanger) {
-				for(Danger userDanger : allUserDanger) {
-					if(robotYellowDanger.equals(userDanger)) {
-						robotYellowDanger.augmentRate(userDanger.getRate());
-					}
-				}
-			}
-			Collections.sort(allRobotYellowDanger);
-			return allRobotYellowDanger.get(0).getCell();
-		}
-		
+
 		List<Danger> allUserGreenDanger = findDangerByLevel(Danger.LEVEL_GREEN, allUserDanger);
 		if(!allUserGreenDanger.isEmpty()) {
 			Danger dangerLv1;
@@ -104,26 +85,73 @@ public class CaroService {
 						dangerLv1.augmentRate(allUserDanger.get(j).getRate());
 					}
 				}
+				for(Danger robotDanger : allRobotDanger) {
+					if(dangerLv1.equals(robotDanger)) {
+						dangerLv1.augmentRate(robotDanger.getRate());
+					}
+				}
 			}
 			Collections.sort(allUserGreenDanger);
 			return allUserGreenDanger.get(0).getCell();
 		}
-		
+		List<Danger> allRobotYellowDanger = findDangerByLevel(Danger.LEVEL_YELLOW, allRobotDanger);
+		if(!allRobotYellowDanger.isEmpty()) {
+			Danger dangerLv1;
+			for(int i = 0; i<allRobotYellowDanger.size(); i++) {
+				dangerLv1 = allRobotYellowDanger.get(i);
+				for(int j=0; j<allRobotDanger.size(); j++) {
+					if(i!=j && dangerLv1.equals(allRobotDanger.get(j))) {
+						dangerLv1.augmentRate(allRobotDanger.get(j).getRate());
+					}
+				}
+				for(Danger userDanger : allUserDanger) {
+					if(dangerLv1.equals(userDanger)) {
+						dangerLv1.augmentRate(userDanger.getRate());
+					}
+				}
+			}
+			Collections.sort(allRobotYellowDanger);
+			return allRobotYellowDanger.get(0).getCell();
+		}
 		List<Danger> allUserWhiteDanger = findDangerByLevel(Danger.LEVEL_WHITE, allUserDanger);
-		if(allUserWhiteDanger.size()>=2) {
-//			List<Danger> allUserContinueDanger = findDangerContinueByValue(Cell.CELL_VALUE_X, allUserWhiteDanger, allCell);
-//			if(!allUserContinueDanger.isEmpty()) {
-//				for(int i = 0; i < allUserContinueDanger.size(); i++) {
-//					for(int j=0; j<allUserContinueDanger.size(); j++) {
-//						if(j == i) continue;
-//						if(allUserContinueDanger.get(i).getCell().equals(allUserContinueDanger.get(j).getCell())) {
-//							allUserContinueDanger.get(i).augmentRate(allUserContinueDanger.get(j).getRate());
-//						}
-//					}
-//				}
-//				Collections.sort(allUserContinueDanger);
-//				return allUserContinueDanger.get(0).getCell();
-//			}
+		if(allUserWhiteDanger.size() >= 6) {
+			List<Danger> allUserContinueDanger = findDangerContinueByValue(Cell.CELL_VALUE_X, allUserWhiteDanger, allCell);
+			if(allUserContinueDanger.size() >= 6) {
+				for(int i = 0; i < allUserContinueDanger.size(); i++) {
+					for(int j=0; j<allUserContinueDanger.size(); j++) {
+						if(j == i) continue;
+						if(allUserContinueDanger.get(i).getCell().equals(allUserContinueDanger.get(j).getCell())) {
+							allUserContinueDanger.get(i).augmentRate(allUserContinueDanger.get(j).getRate());
+						}
+					}
+				}
+				for(Danger userDanger : allUserContinueDanger) {
+					for(Danger robotDanger : allRobotDanger) {
+						if(userDanger.equals(robotDanger)) {
+							robotDanger.augmentRate(userDanger.getRate());
+						}
+					}
+				}
+				Collections.sort(allUserContinueDanger);
+				return allUserContinueDanger.get(0).getCell();
+			}
+		}
+		
+		List<Danger> allRobotWhiteDanger = findDangerByLevel(Danger.LEVEL_WHITE, allRobotDanger);
+		if(allRobotWhiteDanger.size()>=6) {
+			List<Danger> allRobotContinueDanger = findDangerContinueByValue(Cell.CELL_VALUE_O, allRobotWhiteDanger, allCell);
+			if(!allRobotContinueDanger.isEmpty()) {
+				for(int i = 0; i < allRobotContinueDanger.size(); i++) {
+					for(int j=0; j<allRobotContinueDanger.size(); j++) {
+						if(j == i) continue;
+						if(allRobotContinueDanger.get(i).getCell().equals(allRobotContinueDanger.get(j).getCell())) {
+							allRobotContinueDanger.get(i).augmentRate(allRobotContinueDanger.get(j).getRate());
+						}
+					}
+				}
+				Collections.sort(allRobotContinueDanger);
+				return allRobotContinueDanger.get(0).getCell();
+			}
 		}
 		
 		Danger dangerLv1 = null;
@@ -140,100 +168,158 @@ public class CaroService {
 	}
 	
 	private List<Danger> findDangerContinueByValue(int value, List<Danger> allDanger, Cell[][] allCell) {
-		List<Danger> result = new ArrayList<Danger>();
-		List<Danger> tempDanger = null;
+		Map<String, Danger> result = new HashMap<String, Danger>();
 		Danger checkingDanger = null;
 		int minPos = 0;
 		int maxPos = 0;
+		int positionPriority = 0;
 		for(int i = 0; i < allDanger.size(); i++) {
 			checkingDanger = allDanger.get(i);
-			tempDanger = new ArrayList<Danger>();;
 			for(int j = 0; j<allDanger.size(); j++) {
 				if(i==j) continue;
+				positionPriority = 0;
 				if(checkingDanger.getCell().getX() == allDanger.get(j).getCell().getX()) {
-					minPos = checkingDanger.getCell().getY();
-					maxPos = allDanger.get(j).getCell().getY();
-					if(minPos > allDanger.get(j).getCell().getY()) {
+					if(allDanger.get(j).getCell().getY() > checkingDanger.getCell().getY()) {
+						minPos = checkingDanger.getCell().getY();
+						maxPos = allDanger.get(j).getCell().getY();
+						if (maxPos - minPos > 5) continue;
+						for(int index = 0; index <= maxPos-minPos; index++) {
+							if(index <= (maxPos - minPos)/2) {
+								positionPriority++;
+							} else {
+								positionPriority--;
+							}
+							if(allCell[minPos + index][checkingDanger.getCell().getX()].getValue() == 0){
+								String key = String.valueOf(checkingDanger.getCell().getX()).concat(",").concat(String.valueOf(minPos + index)).concat(",x=x");
+								if(result.containsKey(key)) continue;
+								result.put(key, new Danger(allCell[minPos + index][checkingDanger.getCell().getX()], checkingDanger.getLevel(), checkingDanger.getRate(), positionPriority, checkingDanger.getEmptyHead()));
+							}
+						}
+					} else {
 						minPos = allDanger.get(j).getCell().getY();
 						maxPos = checkingDanger.getCell().getY();
-					}
-					if (maxPos - minPos > 5) continue;
-					for(int index = 0; index <= maxPos-minPos; index++) {
-						if(allCell[index][checkingDanger.getCell().getX()].getValue() == -value) {
-							tempDanger.clear();
-							break;
-						} else if(allCell[index][checkingDanger.getCell().getX()].getValue() == 0){
-							tempDanger.add(new Danger(allCell[index][checkingDanger.getCell().getX()], checkingDanger.getLevel(), checkingDanger.getRate(), checkingDanger.getPositionPriority() - index, checkingDanger.getEmptyHead()));
+						if (maxPos - minPos > 5) continue;
+						for(int index = 0; index <= maxPos-minPos; index++) {
+							if(index <= (maxPos - minPos)/2) {
+								positionPriority++;
+							} else {
+								positionPriority--;
+							}
+							if(allCell[minPos + index][allDanger.get(j).getCell().getX()].getValue() == 0){
+								String key = String.valueOf(allDanger.get(j).getCell().getX()).concat(",").concat(String.valueOf(minPos + index)).concat(",x=x");
+								if(result.containsKey(key)) continue;
+								result.put(key, new Danger(allCell[minPos + index][allDanger.get(j).getCell().getX()], allDanger.get(j).getLevel(), checkingDanger.getRate(), positionPriority, allDanger.get(j).getEmptyHead()));
+							}
 						}
-					}
-					if(tempDanger.size() > 0) {
-						result.addAll(tempDanger);
-						tempDanger = new ArrayList<Danger>();
 					}
 				} else if(checkingDanger.getCell().getY() == allDanger.get(j).getCell().getY()) {
-					minPos = checkingDanger.getCell().getX();
-					maxPos = allDanger.get(j).getCell().getX();
-					if(minPos > allDanger.get(j).getCell().getX()) {
+					if(allDanger.get(j).getCell().getX() > checkingDanger.getCell().getX()) {
+						minPos = checkingDanger.getCell().getX();
+						maxPos = allDanger.get(j).getCell().getX();
+						if (maxPos - minPos > 5) continue;
+						for(int index = 0; index <= maxPos - minPos; index++) {
+							if(index <= (maxPos - minPos)/2) {
+								positionPriority++;
+							} else {
+								positionPriority--;
+							}
+							if(allCell[checkingDanger.getCell().getY()][minPos+index].getValue() == 0){
+								String key = String.valueOf(minPos+index).concat(",").concat(String.valueOf(checkingDanger.getCell().getY())).concat(",y=y");
+								if(result.containsKey(key)) continue;
+								result.put(key, new Danger(allCell[checkingDanger.getCell().getY()][minPos+index], checkingDanger.getLevel(), checkingDanger.getRate(), positionPriority, checkingDanger.getEmptyHead()));
+							}
+						}
+					} else {
 						minPos = allDanger.get(j).getCell().getX();
 						maxPos = checkingDanger.getCell().getX();
-					}
-					if (maxPos - minPos > 5) continue;
-					for(int index = 0; index <= maxPos - minPos; index++) {
-						if(allCell[checkingDanger.getCell().getY()][index].getValue() == -value) {
-							tempDanger.clear();
-							break;
-						} else if(allCell[checkingDanger.getCell().getY()][index].getValue() == 0){
-							tempDanger.add(new Danger(allCell[checkingDanger.getCell().getY()][index], checkingDanger.getLevel(), checkingDanger.getRate(), checkingDanger.getPositionPriority() - index, checkingDanger.getEmptyHead()));
+						if (maxPos - minPos > 5) continue;
+						for(int index = 0; index <= maxPos - minPos; index++) {
+							if(index <= (maxPos - minPos)/2) {
+								positionPriority++;
+							} else {
+								positionPriority--;
+							}
+							if(allCell[allDanger.get(j).getCell().getY()][minPos+index].getValue() == 0){
+								String key = String.valueOf(minPos+index).concat(",").concat(String.valueOf(allDanger.get(j).getCell().getY())).concat(",y=y");
+								if(result.containsKey(key)) continue;
+								result.put(key, new Danger(allCell[allDanger.get(j).getCell().getY()][minPos+index], checkingDanger.getLevel(), checkingDanger.getRate(), positionPriority, allDanger.get(j).getEmptyHead()));
+							}
 						}
-					}
-					if(tempDanger.size() > 0) {
-						result.addAll(tempDanger);
-						tempDanger = new ArrayList<Danger>();
-					}
+					}					
 				} else if(checkingDanger.getCell().getY() + allDanger.get(j).getCell().getX() == checkingDanger.getCell().getY() + allDanger.get(j).getCell().getX()) {
-					minPos = checkingDanger.getCell().getY();
-					maxPos = allDanger.get(j).getCell().getY();
-					if(minPos > maxPos) {
+					if(checkingDanger.getCell().getY() > allDanger.get(j).getCell().getY()) {
 						minPos = allDanger.get(j).getCell().getY();
 						maxPos = checkingDanger.getCell().getY();
-					}
-					if (maxPos - minPos > 4) continue;
-					for(int index = 0; index <= maxPos - minPos; index++) {
-						if(allCell[checkingDanger.getCell().getY() + index][checkingDanger.getCell().getX() - index].getValue() == -value) {
-							tempDanger.clear();
-							break;
-						} else if(allCell[checkingDanger.getCell().getY() + index][checkingDanger.getCell().getX() - index].getValue() == 0){
-							tempDanger.add(new Danger(allCell[checkingDanger.getCell().getY() + index][checkingDanger.getCell().getX() - index], checkingDanger.getLevel(), checkingDanger.getRate(), checkingDanger.getPositionPriority() - index, checkingDanger.getEmptyHead()));
+						if (maxPos - minPos > 5) continue;
+						for(int index = 0; index <= maxPos - minPos; index++) {
+							if(index <= (maxPos - minPos)/2) {
+								positionPriority++;
+							} else {
+								positionPriority--;
+							}
+							if(allCell[allDanger.get(j).getCell().getY() + index][allDanger.get(j).getCell().getX() - index].getValue() == 0){
+								String key = String.valueOf(allDanger.get(j).getCell().getX() - index).concat(",").concat(String.valueOf(allDanger.get(j).getCell().getY() + index)).concat(",x+y=x+y");
+								if(result.containsKey(key)) continue;
+								result.put(key, new Danger(allCell[allDanger.get(j).getCell().getY() + index][allDanger.get(j).getCell().getX() - index], checkingDanger.getLevel(), checkingDanger.getRate(), positionPriority, allDanger.get(j).getEmptyHead()));
+							}
+						}
+					} else {
+						minPos = checkingDanger.getCell().getY();
+						maxPos = allDanger.get(j).getCell().getY();
+						if (maxPos - minPos > 5) continue;
+						for(int index = 0; index <= maxPos - minPos; index++) {
+							if(index <= (maxPos - minPos)/2) {
+								positionPriority++;
+							} else {
+								positionPriority--;
+							}
+							if(allCell[checkingDanger.getCell().getY() + index][checkingDanger.getCell().getX() - index].getValue() == 0){
+								String key = String.valueOf(checkingDanger.getCell().getX() - index).concat(",").concat(String.valueOf(checkingDanger.getCell().getY() + index)).concat(",x+y=x+y");
+								if(result.containsKey(key)) continue;
+								result.put(key, new Danger(allCell[checkingDanger.getCell().getY() + index][checkingDanger.getCell().getX() - index], checkingDanger.getLevel(), checkingDanger.getRate(), positionPriority, checkingDanger.getEmptyHead()));
+							}
 						}
 					}
-					if(tempDanger.size() > 0) {
-						result.addAll(tempDanger);
-						tempDanger = new ArrayList<Danger>();
-					}
+					
 				} else if(checkingDanger.getCell().getY() - allDanger.get(j).getCell().getX() == checkingDanger.getCell().getY() - allDanger.get(j).getCell().getX()) {
-					minPos = checkingDanger.getCell().getY();
-					maxPos = allDanger.get(j).getCell().getY();
-					if(minPos > maxPos) {
+					if(checkingDanger.getCell().getY() > allDanger.get(j).getCell().getY()) {
 						minPos = allDanger.get(j).getCell().getY();
 						maxPos = checkingDanger.getCell().getY();
-					}
-					if (maxPos - minPos > 4) continue;
-					for(int index = 0; index <= maxPos-minPos; index++) {
-						if(allCell[checkingDanger.getCell().getY() + index][checkingDanger.getCell().getX() + index].getValue() == -value) {
-							tempDanger.clear();
-							break;
-						} else if(allCell[checkingDanger.getCell().getY() + index][checkingDanger.getCell().getX() + index].getValue() == 0){
-							tempDanger.add(new Danger(allCell[checkingDanger.getCell().getY() + index][checkingDanger.getCell().getX() + index], checkingDanger.getLevel(), checkingDanger.getRate(), checkingDanger.getPositionPriority() - index, checkingDanger.getEmptyHead()));
+						if (maxPos - minPos > 5) continue;
+						for(int index = 0; index <= maxPos-minPos; index++) {
+							if(index <= (maxPos - minPos)/2) {
+								positionPriority++;
+							} else {
+								positionPriority--;
+							}
+							if(allCell[allDanger.get(j).getCell().getY() + index][allDanger.get(j).getCell().getX() + index].getValue() == 0){
+								String key = String.valueOf(allDanger.get(j).getCell().getX() + index).concat(",").concat(String.valueOf(allDanger.get(j).getCell().getY() + index)).concat(",x-y=x-y");
+								if(result.containsKey(key)) continue;
+								result.put(key, new Danger(allCell[allDanger.get(j).getCell().getY() + index][allDanger.get(j).getCell().getX() + index], checkingDanger.getLevel(), checkingDanger.getRate(), positionPriority, allDanger.get(j).getEmptyHead()));
+							}
 						}
-					}
-					if(tempDanger.size() > 0) {
-						result.addAll(tempDanger);
-						tempDanger = new ArrayList<Danger>();
+					} else {
+						minPos = checkingDanger.getCell().getY();
+						maxPos = allDanger.get(j).getCell().getY();
+						if (maxPos - minPos > 5) continue;
+						for(int index = 0; index <= maxPos-minPos; index++) {
+							if(index <= (maxPos - minPos)/2) {
+								positionPriority++;
+							} else {
+								positionPriority--;
+							}
+							if(allCell[checkingDanger.getCell().getY() + index][checkingDanger.getCell().getX() + index].getValue() == 0){
+								String key = String.valueOf(checkingDanger.getCell().getX() + index).concat(",").concat(String.valueOf(checkingDanger.getCell().getY() + index)).concat(",x-y=x-y");
+								if(result.containsKey(key)) continue;
+								result.put(key, new Danger(allCell[checkingDanger.getCell().getY() + index][checkingDanger.getCell().getX() + index], checkingDanger.getLevel(), checkingDanger.getRate(), positionPriority, checkingDanger.getEmptyHead()));
+							}
+						}
 					}
 				}
 			}
 		}
-		return result;
+		List<Danger> resultList = new ArrayList<Danger>(result.values());
+		return resultList;
 	}
 	
 	private List<Danger> findDangerByLevel(int level ,List<Danger> allDanger) {
@@ -255,9 +341,9 @@ public class CaroService {
 
 	private List<Danger> findDangerCells(List<Cell> allCellsOfRow) {
 		List<Danger> allDangerCell = new ArrayList<Danger>();
-		if(allCellsOfRow.size() < 5) {
-			return allDangerCell;
-		}
+//		if(allCellsOfRow.size() < 5) {
+//			return allDangerCell;
+//		}
 		int leftPosition = 0;
 		int rightPosition = 0;
 		for(int i = 0; i < allCellsOfRow.size(); i++) {
@@ -295,7 +381,7 @@ public class CaroService {
 		int dangerLevel = Danger.LEVEL_NORMAL;
 		int dangerRate = checkedNode-(rowLength - checkedNode);
 		if((checkedNode >= 4 && rowLength - checkedNode <= 1)
-				|| (checkedNode == 4 && leftPosition + rightPosition > 0)) {
+				|| (checkedNode == 4 && leftPosition + rightPosition > 0 && rowLength == 4)) {
 			dangerLevel = Danger.LEVEL_RED;
 			if(rowLength - checkedNode == 1) {
 				centerPiority = 999999;
@@ -316,9 +402,10 @@ public class CaroService {
 			if(rowLength - checkedNode == 1) {
 				centerPiority = 3;
 			}
-		} else if(checkedNode == 2 && rowLength - checkedNode < 2 
+		} else if((checkedNode == 2 && rowLength - checkedNode < 2 
 				&& leftPosition * rightPosition > 0 
-				&& leftPosition + checkedNode + rightPiority >= 5) {
+				&& leftPosition + checkedNode + rightPosition >= 5)
+				|| (checkedNode == 3 && rowLength - checkedNode<=4 && leftPosition + checkedNode + rightPosition >= 5)) {
 			dangerLevel = Danger.LEVEL_WHITE;
 		}
 		int limitted = 2;

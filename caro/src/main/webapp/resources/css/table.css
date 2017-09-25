@@ -36,6 +36,8 @@
 	border-right-width: thin;
 	border-right-color: silver;
 	display: inline-block;
+	position: relative;
+    left: 20px;
 }
 .row_title{
 	width: 20x;
