@@ -87,7 +87,7 @@ function requestRobotStep() {
 			if(response.result.isWin) {
 				finishGame(response.result.winRow);
 				setTimeout(function(){
-					alert("Robot are win.");
+					alert("Doraemon is WIN.");
 					isFinished = true;
 					registerTable();
 				}, 1000);
@@ -125,7 +125,7 @@ function addRobotStep(x, y) {
 function drowTable(tableDiv) {
 	var TABLE_ROW = 30;
 	var TABLE_COLLUMN = 30;
-	tableData = []
+	tableData = [];
 	var tableHTML = "";
 	for(var y = TABLE_ROW -1; y >= 0; y--) {
 		var rowCell = [];
