@@ -124,13 +124,13 @@ public class CaroService {
 			return allRobotYellowDanger.get(0).getCell();
 		}
 		
-		List<Cell> experienceCell = caroDAO.findNextStepByByTableData(caroTable.getTableData());
-		if(!experienceCell.isEmpty()) {
-			Cell bestCell = experienceCell.get(0);
-			bestCell.setX(bestCell.getX()+caroTable.getMinX());
-			bestCell.setY(bestCell.getY()+caroTable.getMinY());
-			return bestCell;
-		}
+//		List<Cell> experienceCell = caroDAO.findNextStepByByTableData(caroTable.getTableData());
+//		if(!experienceCell.isEmpty()) {
+//			Cell bestCell = experienceCell.get(0);
+//			bestCell.setX(bestCell.getX()+caroTable.getMinX());
+//			bestCell.setY(bestCell.getY()+caroTable.getMinY());
+//			return bestCell;
+//		}
 
 		if(allRobotWhiteDanger.size()>=6) {
 			List<Danger> allContinueDanger = getContinueDanger(allRobotWhiteDanger);
