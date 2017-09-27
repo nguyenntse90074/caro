@@ -2,6 +2,7 @@ package com.tn.caro.bean;
 
 public class Cell {
 
+	private static final String COMMAR = ",";
 	public static final int CELL_VALUE_X = 1;
 	public static final int CELL_VALUE_O = -1;
 	public static final int CELL_VALUE_E = 0;
@@ -13,6 +14,12 @@ public class Cell {
 		this.x = x;
 		this.y = y;
 		this.value = value;
+	}
+	
+	public Cell(String cellAddress) {
+		String[] address = cellAddress.split(COMMAR);
+		x = Integer.parseInt(address[0]);
+		y = Integer.parseInt(address[1]);
 	}
 	
 	public Cell(int x, int y) {
@@ -51,5 +58,9 @@ public class Cell {
 		}
 		Cell otherCell = (Cell) object;
 		return this.x == otherCell.getX() && this.y == otherCell.getY() && this.value == otherCell.getValue();
+	}
+	
+	public String toString() {
+		return x + COMMAR + y;
 	}
 }

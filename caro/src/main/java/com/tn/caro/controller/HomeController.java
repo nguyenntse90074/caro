@@ -46,6 +46,7 @@ public class HomeController {
 		response.setResult(caroService.checkResult(userCell, caroTable));
 		if(response.getResult().getIsWin()) {
 			tableManager.deleteTableById(tableId);
+			caroService.saveLostTable(caroTable);
 		}
 		return new ResponseEntity<Response>(response, HttpStatus.OK);
 	}
@@ -62,6 +63,14 @@ public class HomeController {
 		if(response.getResult().getIsWin()) {
 			tableManager.deleteTableById(tableId);
 		}
+		return new ResponseEntity<Response>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/time_out", method=RequestMethod.GET)
+	public ResponseEntity<Response> userTimeOut(@RequestParam(required=true) Long tableId) {
+		tableManager.deleteTableById(tableId);
+		Response response = new Response();
+		response.setStatus(Response.STATUS_OK);
 		return new ResponseEntity<Response>(response, HttpStatus.OK);
 	}
 }

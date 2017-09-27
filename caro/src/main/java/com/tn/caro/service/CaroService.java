@@ -2,7 +2,9 @@ package com.tn.caro.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,10 +35,10 @@ public class CaroService {
 			allRobotDanger.addAll(findDangerCells(allCellsOfRow));
 		}
 		
-		return findBestCellForRobot(allUserDanger, allRobotDanger, caroTable.getAllCell());
+		return findBestCellForRobot(allUserDanger, allRobotDanger, caroTable);
 	}
 	
-	private Cell findBestCellForRobot(List<Danger> allUserDanger, List<Danger> allRobotDanger, Cell[][] allCell) {	
+	private Cell findBestCellForRobot(List<Danger> allUserDanger, List<Danger> allRobotDanger, CaroTable caroTable) {	
 		Collections.sort(allUserDanger);
 		Collections.sort(allRobotDanger);
 		
@@ -60,7 +62,7 @@ public class CaroService {
 				dangerLv1 = allUserRedDanger.get(i);
 				for(int j=0; j<allUserDanger.size(); j++) {
 					if(i != j && dangerLv1.equals(allUserDanger.get(j))) {
-						dangerLv1.augmentRate(allUserDanger.get(j).getRate());
+						dangerLv1.augmentRate(allUserDanger.get(j));
 					}
 				}
 			}
@@ -68,13 +70,38 @@ public class CaroService {
 			return allUserRedDanger.get(0).getCell();
 		}
 
+		if(allUserYellowDanger.size() >= 4 && !allRobotYellowDanger.isEmpty()) {
+			for(Danger userDanger : allUserYellowDanger) {
+				for(Danger robotDanger : allRobotYellowDanger) {
+					if(userDanger.equals(robotDanger)) {
+						userDanger.augmentRate(robotDanger);
+					}
+				}
+			}
+			Collections.sort(allUserYellowDanger);
+			return allUserYellowDanger.get(0).getCell();
+		}
+		if(allUserYellowDanger.size() >= 3) {
+			Danger dangerLv1;
+			for(int i = 0; i<allUserYellowDanger.size(); i++) {
+				dangerLv1 = allUserYellowDanger.get(i);
+				for(int j=0; j<allUserYellowDanger.size(); j++) {
+					if(i != j && dangerLv1.equals(allUserYellowDanger.get(j))) {
+						dangerLv1.augmentRate(allUserYellowDanger.get(j));
+					}
+				}
+			}
+			
+			Collections.sort(allUserYellowDanger);
+			return allUserYellowDanger.get(0).getCell();
+		}
 		if(!allUserYellowDanger.isEmpty()) {
 			Danger dangerLv1;
 			for(int i = 0; i<allUserYellowDanger.size(); i++) {
 				dangerLv1 = allUserYellowDanger.get(i);
 				for(int j=0; j<allUserDanger.size(); j++) {
 					if(i != j && dangerLv1.equals(allUserDanger.get(j))) {
-						dangerLv1.augmentRate(allUserDanger.get(j).getRate());
+						dangerLv1.augmentRate(allUserDanger.get(j));
 					}
 				}
 			}
@@ -89,12 +116,7 @@ public class CaroService {
 				dangerLv1 = allRobotYellowDanger.get(i);
 				for(int j=0; j<allRobotDanger.size(); j++) {
 					if(i!=j && dangerLv1.equals(allRobotDanger.get(j))) {
-						dangerLv1.augmentRate(allRobotDanger.get(j).getRate());
-					}
-				}
-				for(Danger userDanger : allUserDanger) {
-					if(dangerLv1.equals(userDanger)) {
-						dangerLv1.augmentRate(userDanger.getRate());
+						dangerLv1.augmentRate(allRobotDanger.get(j));
 					}
 				}
 			}
@@ -102,69 +124,75 @@ public class CaroService {
 			return allRobotYellowDanger.get(0).getCell();
 		}
 		
-//		if(!allUserGreenDanger.isEmpty()) {
-//			Danger dangerLv1;
-//			for(int i = 0; i<allUserGreenDanger.size(); i++) {
-//				dangerLv1 = allUserGreenDanger.get(i);
-//				for(int j=0; j<allUserDanger.size(); j++) {
-//					if(i!=j && dangerLv1.equals(allUserDanger.get(j))) {
-//						dangerLv1.augmentRate(allUserDanger.get(j).getRate());
-//					}
-//				}
-//				for(Danger robotDanger : allRobotDanger) {
-//					if(dangerLv1.equals(robotDanger)) {
-//						dangerLv1.augmentRate(robotDanger.getRate());
-//					}
-//				}
-//			}
-//			Collections.sort(allUserGreenDanger);
-//			return allUserGreenDanger.get(0).getCell();
-//		}
-		
-		if(allUserWhiteDanger.size() >= 6) {
-			reRateDangerContinue(allUserWhiteDanger);
-			if(allUserWhiteDanger.size() >= 6) {
-				for(int i = 0; i < allUserDanger.size(); i ++) {
-					for(int j = 0; j<allUserDanger.size(); j++) {
-						if(i == j) continue;
-						if(allUserDanger.get(i).equals(allUserDanger.get(j))) {
-							allUserDanger.get(i).augmentRate(allUserDanger.get(j).getRate());
+		List<Cell> experienceCell = caroDAO.findNextStepByByTableData(caroTable.getTableData());
+		if(!experienceCell.isEmpty()) {
+			Cell bestCell = experienceCell.get(0);
+			bestCell.setX(bestCell.getX()+caroTable.getMinX());
+			bestCell.setY(bestCell.getY()+caroTable.getMinY());
+			return bestCell;
+		}
+
+		if(allRobotWhiteDanger.size()>=6) {
+			List<Danger> allContinueDanger = getContinueDanger(allRobotWhiteDanger);
+			if(!allContinueDanger.isEmpty()) {
+				for(int i = 0; i < allContinueDanger.size(); i++) {
+					for(int j=0; j<allContinueDanger.size(); j++) {
+						if(j == i) continue;
+						if(allContinueDanger.get(i).getCell().equals(allContinueDanger.get(j).getCell())) {
+							allContinueDanger.get(i).augmentRate(allContinueDanger.get(j));
 						}
 					}
 				}
-				Collections.sort(allUserWhiteDanger);
-				return allUserWhiteDanger.get(0).getCell();
+				Collections.sort(allContinueDanger);
+				return allContinueDanger.get(0).getCell();
 			}
 		}
-		if(allRobotWhiteDanger.size()>=6) {
-			reRateDangerContinue(allRobotWhiteDanger);
-			for(int i = 0; i < allRobotWhiteDanger.size(); i++) {
-				for(int j=0; j<allRobotWhiteDanger.size(); j++) {
-					if(j == i) continue;
-					if(allRobotWhiteDanger.get(i).getCell().equals(allRobotWhiteDanger.get(j).getCell())) {
-						allRobotWhiteDanger.get(i).augmentRate(allRobotWhiteDanger.get(j).getRate());
+		
+		if(allUserWhiteDanger.size() >= 6) {
+			List<Danger> allContinueDanger = getContinueDanger(allUserWhiteDanger);
+			if(!allContinueDanger.isEmpty()) {
+				for(int i = 0; i < allContinueDanger.size(); i ++) {
+					for(int j = 0; j<allContinueDanger.size(); j++) {
+						if(i == j) continue;
+						if(allContinueDanger.get(i).equals(allContinueDanger.get(j))) {
+							allContinueDanger.get(i).augmentRate(allContinueDanger.get(j));
+						}
 					}
 				}
+				Collections.sort(allContinueDanger);
+				return allContinueDanger.get(0).getCell();
 			}
-			Collections.sort(allRobotWhiteDanger);
-			return allRobotWhiteDanger.get(0).getCell();
 		}
 		if(!allRobotDanger.isEmpty()) {
-			for(Danger robotDanger : allRobotDanger) {
-				for(Danger userDanger : allRobotDanger) {
-					if(robotDanger.equals(userDanger)) {
-						robotDanger.augmentRate(userDanger.getRate());
+			for(int i = 0; i < allRobotDanger.size(); i++) {
+				for(int j = 0; j<allRobotDanger.size(); j++) {
+					if(i==j) continue;
+					if(allRobotDanger.get(i).equals(allRobotDanger.get(j))) {
+						allRobotDanger.get(i).augmentRate(allRobotDanger.get(j));
 					}
 				}
 			}
 			Collections.sort(allRobotDanger);
 			return allRobotDanger.get(0).getCell();
 		}
+
+		for(Danger userDanger : allUserDanger) {
+			for(Danger robotDanger : allRobotDanger) {
+				if(userDanger.equals(robotDanger)) {
+					userDanger.augmentRate(robotDanger);
+				}
+			}
+		}
+		Collections.sort(allUserDanger);
 		return allUserDanger.get(0).getCell();
-		
 	}
 	
-	private void reRateDangerContinue(List<Danger> allDanger) {
+	private List<Danger> getContinueDanger(List<Danger> allDanger) {
+		List<Danger> result = new ArrayList<Danger>();
+		Map<String,Danger> rowDangerXX = new HashMap<String,Danger>();
+		Map<String,Danger> rowDangerYY = new HashMap<String,Danger>();
+		Map<String,Danger> rowDangerXXYY = new HashMap<String,Danger>();
+		Map<String,Danger> rowDangerYXYX = new HashMap<String,Danger>();
 		Danger checkingDanger = null;
 		for(int i = 0; i < allDanger.size(); i++) {
 			checkingDanger = allDanger.get(i);
@@ -172,27 +200,73 @@ public class CaroService {
 				if(i==j) continue;
 				if(checkingDanger.getCell().getX() == allDanger.get(j).getCell().getX()) {
 					if(Math.abs(allDanger.get(j).getCell().getY() - checkingDanger.getCell().getY()) < 5) {
-						checkingDanger.augmentRate(1);
-						allDanger.get(j).augmentRate(1);
+						if(!rowDangerXX.containsKey(checkingDanger.getCellAddress())) {
+							rowDangerXX.put(checkingDanger.getCellAddress(), checkingDanger);
+						}
+						if(!rowDangerXX.containsKey(allDanger.get(j).getCellAddress())) {
+							rowDangerXX.put(allDanger.get(j).getCellAddress(), allDanger.get(j));
+						}
 					}
 				} else if(checkingDanger.getCell().getY() == allDanger.get(j).getCell().getY()) {
 					if(Math.abs(allDanger.get(j).getCell().getX() - checkingDanger.getCell().getX()) < 5) {
-						checkingDanger.augmentRate(1);
-						allDanger.get(j).augmentRate(1);
+						if(!rowDangerYY.containsKey(checkingDanger.getCellAddress())) {
+							rowDangerYY.put(checkingDanger.getCellAddress(), checkingDanger);
+						}
+						if(!rowDangerYY.containsKey(allDanger.get(j).getCellAddress())) {
+							rowDangerYY.put(allDanger.get(j).getCellAddress(), allDanger.get(j));
+						}
 					}				
 				} else if(checkingDanger.getCell().getY() + allDanger.get(j).getCell().getX() == checkingDanger.getCell().getY() + allDanger.get(j).getCell().getX()) {
 					if(Math.abs(allDanger.get(j).getCell().getY() - checkingDanger.getCell().getY()) < 5) {
-						checkingDanger.augmentRate(1);
-						allDanger.get(j).augmentRate(1);
+						if(!rowDangerXXYY.containsKey(checkingDanger.getCellAddress())) {
+							rowDangerXXYY.put(checkingDanger.getCellAddress(), checkingDanger);
+						}
+						if(!rowDangerXXYY.containsKey(allDanger.get(j).getCellAddress())) {
+							rowDangerXXYY.put(allDanger.get(j).getCellAddress(), allDanger.get(j));
+						}
 					}
 				} else if(checkingDanger.getCell().getY() - allDanger.get(j).getCell().getX() == checkingDanger.getCell().getY() - allDanger.get(j).getCell().getX()) {
 					if(Math.abs(allDanger.get(j).getCell().getY()-checkingDanger.getCell().getY()) < 5) {
-						checkingDanger.augmentRate(1);
-						allDanger.get(j).augmentRate(1);
+						if(!rowDangerYXYX.containsKey(checkingDanger.getCellAddress())) {
+							rowDangerYXYX.put(checkingDanger.getCellAddress(), checkingDanger);
+						}
+						if(!rowDangerYXYX.containsKey(allDanger.get(j).getCellAddress())) {
+							rowDangerYXYX.put(allDanger.get(j).getCellAddress(), allDanger.get(j));
+						}
 					}
 				}
 			}
 		}
+		List<Cell> cellDangerLv2 = new ArrayList<Cell>();
+		for(Danger danger : rowDangerXX.values()) {
+			cellDangerLv2.add(danger.getCell());
+		}
+		if(!findDangerByLevel(Danger.LEVEL_WHITE, findDangerCells(cellDangerLv2)).isEmpty()) {
+			result.addAll(rowDangerXX.values());
+		}
+		cellDangerLv2.clear();
+		for(Danger danger : rowDangerYY.values()) {
+			cellDangerLv2.add(danger.getCell());
+		}
+		if(!findDangerByLevel(Danger.LEVEL_WHITE, findDangerCells(cellDangerLv2)).isEmpty()) {
+			result.addAll(rowDangerYY.values());
+		}
+		cellDangerLv2.clear();
+		for(Danger danger : rowDangerXXYY.values()) {
+			cellDangerLv2.add(danger.getCell());
+		}
+		if(!findDangerByLevel(Danger.LEVEL_WHITE, findDangerCells(cellDangerLv2)).isEmpty()) {
+			result.addAll(rowDangerXXYY.values());
+		}
+		cellDangerLv2.clear();
+		for(Danger danger : rowDangerYXYX.values()) {
+			cellDangerLv2.add(danger.getCell());
+		}
+		if(!findDangerByLevel(Danger.LEVEL_WHITE, findDangerCells(cellDangerLv2)).isEmpty()) {
+			result.addAll(rowDangerYXYX.values());
+		}
+		
+		return result;
 	}
 	
 	private List<Danger> findDangerByLevel(int level ,List<Danger> allDanger) {
@@ -211,7 +285,11 @@ public class CaroService {
 		result.setWinRow(winRow.toArray(new Cell[winRow.size()]));
 		return result;
 	}
-
+	
+	public void saveLostTable(CaroTable caroTable) {
+		caroDAO.saveLostTable(caroTable);
+	}
+	
 	private List<Danger> findDangerCells(List<Cell> allCellsOfRow) {
 		List<Danger> allDangerCell = new ArrayList<Danger>();
 //		if(allCellsOfRow.size() < 5) {
@@ -237,9 +315,9 @@ public class CaroService {
 				checkedNode++;
 			}
 		}
-		int leftPiority = 0;
-		int rightPiority = 0;
-		int centerPiority = 0;
+		int leftPiority = 2;
+		int rightPiority = 2;
+		int centerPiority = 2;
 		int emptyHead = 0;
 		if(leftPosition > 0) {
 			emptyHead++;
@@ -280,27 +358,32 @@ public class CaroService {
 			}
 		}
 		int limitted = 2;
-		if(dangerLevel >= Danger.LEVEL_GREEN) {
+		if(dangerLevel >= Danger.LEVEL_YELLOW) {
 			limitted = 1;
-		}
-		if(leftPosition > rightPosition) {
-			leftPiority = 1;
-			rightPiority = 0;
-		} else {
-			leftPiority = 0;
+			leftPiority = 2;
+			rightPiority = 2;
+		}else if(leftPosition > rightPosition) {
+			leftPiority = 2;
 			rightPiority = 1;
+		} else if(leftPosition < rightPosition){
+			leftPiority = 1;
+			rightPiority = 2;
+		} else if(leftPosition > 0 && rightPosition > 0) {
+			leftPiority = 2;
+			rightPiority = 2;
 		}
 		for(int i = 0; i < leftPosition && i<limitted; i++) {
-			allDangerCell.add(new Danger(allCellsOfRow.get(leftPosition-i-1),dangerLevel, dangerRate, leftPiority - i, emptyHead));
+			allDangerCell.add(new Danger(allCellsOfRow.get(leftPosition-i-1),dangerLevel, dangerRate, (leftPiority - i)*emptyHead, emptyHead));
 		}
 		for(int i = 0; i < rightPosition && i<limitted; i++) {
-			allDangerCell.add(new Danger(allCellsOfRow.get(leftPosition+rowLength+i),dangerLevel, dangerRate, rightPiority - i, emptyHead));
+			allDangerCell.add(new Danger(allCellsOfRow.get(leftPosition+rowLength+i),dangerLevel, dangerRate, (rightPiority - i)*emptyHead, emptyHead));
 		}
 		for(int i = leftPosition; i < leftPosition + rowLength; i++) {
 			if(allCellsOfRow.get(i).getValue() == Cell.CELL_VALUE_E) {
-				allDangerCell.add(new Danger(allCellsOfRow.get(i),dangerLevel, dangerRate, centerPiority, emptyHead));
+				allDangerCell.add(new Danger(allCellsOfRow.get(i),dangerLevel, dangerRate, centerPiority*emptyHead, emptyHead));
 			}
 		}
 		return allDangerCell;
 	}
+
 }

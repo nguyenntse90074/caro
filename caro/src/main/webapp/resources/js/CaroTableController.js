@@ -19,6 +19,27 @@ $(document).ready(function(){
 	registerTable();
 });
 
+function setUserTimer() {
+	timer = 5;
+	while(timer > 0) {
+		$("#user_timer").text(timer);
+		sleep(1000);
+		timer -= 1;
+	}
+	if(!user_turns) return;
+	user_turns = true;
+	alert("Doraemon is WIN.");
+	isFinished = true;
+	$.ajax({
+		type: "GET",
+		url: "time_out?tableId=" + tableId,
+		dataType: "json",
+		success: function(response) {
+			registerTable();
+		}
+	});
+}
+
 function focusToCell(cell) {
 	if(!user_turns) return;
 	var x = Number($(cell).attr("x"));

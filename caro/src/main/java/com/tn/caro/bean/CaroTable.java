@@ -14,7 +14,7 @@ public class CaroTable {
 	
 	public static final int ROW = 30;
 	public static final int COLLUMN = 30;
-	
+	public static final String COMMA = ",";
 	private long tableId;
 	private Cell[][] allCell;
 	private List<Cell> history;
@@ -431,8 +431,35 @@ public class CaroTable {
 	public Cell[][] getAllCell() {
 		return allCell;
 	}
-	
+
 	public boolean isOutOfDate() {
 		return isFinished || LocalDateTime.now().until(lastUpdated, ChronoUnit.MINUTES) > 1;
+	}
+
+	public String getTableData() {
+		StringBuilder dataBuilder = new StringBuilder();
+		for(Cell cell : history) {
+			dataBuilder.append(cell.getX() - minX).append(COMMA).append(cell.getY()-minY);
+			dataBuilder.append("|");
+		}
+		return dataBuilder.deleteCharAt(dataBuilder.length()-1).toString();
+	}
+	public String getTableDataBefore(int step) {
+		StringBuilder dataBuilder = new StringBuilder();
+		for(int i = 0; i < history.size() - step; i++){
+			dataBuilder.append(history.get(i).getX() - minX).append(COMMA).append(history.get(i).getY()-minY);
+			dataBuilder.append("|");
+		}
+		return dataBuilder.deleteCharAt(dataBuilder.length()-1).toString();
+	}
+
+	public String getStepBefore(int step) {
+		if(step < history.size()) {
+			Cell cell = history.get(step);
+			cell.setX(cell.getX() - minX);
+			cell.setY(cell.getY() - minY);
+			return history.get(step).toString();
+		}
+		return null;
 	}
 }

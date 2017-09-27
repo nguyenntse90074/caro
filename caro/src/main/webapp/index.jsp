@@ -7,6 +7,7 @@
 </head>
 <body>
 <div id="user_panel" class="user_panel">
+	<div id="user_timer" class="user_timer"></div>
 	<!-- <div class="avatar">
 		<img alt="Robot" src="resources/img/doraemon.png">
 	</div> -->

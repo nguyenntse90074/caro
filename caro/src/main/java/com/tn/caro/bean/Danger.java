@@ -26,18 +26,10 @@ public class Danger implements Comparable<Danger> {
 		if(this.level != o.getLevel()) {
 			return o.getLevel() - this.getLevel();
 		}
-		if(this.level >= LEVEL_GREEN) {
-			if(o.getPositionPriority() != this.getPositionPriority()) {
-				return o.getPositionPriority() - this.getPositionPriority();
-			}
-		}
 		if(this.rate != o.getRate()) {
 			return o.getRate() - this.getRate();
 		}
-		if(o.getPositionPriority() != this.getPositionPriority()) {
-			return o.getPositionPriority() - this.getPositionPriority();
-		}
-		return o.getEmptyHead() - this.getEmptyHead();
+		return o.getEmptyHead() * o.getPositionPriority() - this.getEmptyHead() * this.getPositionPriority();
 	}
 	
 	public int getRate() {
@@ -73,7 +65,14 @@ public class Danger implements Comparable<Danger> {
 		return cell.equals(((Danger)object).getCell());
 	}
 	
-	public void augmentRate(int rate) {
-		this.rate += rate;
+	public void augmentRate(Danger oDanger) {
+		this.level += oDanger.getLevel();
+		this.rate += oDanger.getRate();
+		this.emptyHead += oDanger.getEmptyHead();
+		this.positionPriority += oDanger.getPositionPriority();
+	}
+	
+	public String getCellAddress() {
+		return cell.toString();
 	}
 }
