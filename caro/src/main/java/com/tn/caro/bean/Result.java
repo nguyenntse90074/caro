@@ -2,14 +2,14 @@ package com.tn.caro.bean;
 
 public class Result {
 
-	private Cell[] winRow;
+	private Step[] winRow;
 	private boolean isWin;
 	
 	public Result() {
 		isWin = false;
 	}
 	
-	public Cell[] getWinRow() {
+	public Step[] getWinRow() {
 		return winRow;
 	}
 	
@@ -21,7 +21,7 @@ public class Result {
 		this.isWin = isWin;
 	}
 	
-	public void setWinRow(Cell[] winRow) {
+	public void setWinRow(Step[] winRow) {
 		this.winRow = winRow;
 	}
 }

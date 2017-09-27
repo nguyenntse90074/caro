@@ -80,7 +80,7 @@ function submitUserStep(x, y) {
 		url: "add-user-step?tableId=" + tableId + "&x=" + x + "&y=" + y,
 		dataType: "json",
 		success: function(response) {
-			addUserStep(response.cell.x, response.cell.y);
+			addUserStep(response.step.x, response.step.y);
 			if(response.result.isWin) {
 				finishGame(response.result.winRow);
 				setTimeout(function(){
@@ -104,7 +104,7 @@ function requestRobotStep() {
 		url: "request-robot-step?tableId="+tableId,
 		dataType: "json",
 		success: function(response) {
-			addRobotStep(response.cell.x, response.cell.y);
+			addRobotStep(response.step.x, response.step.y);
 			if(response.result.isWin) {
 				finishGame(response.result.winRow);
 				setTimeout(function(){

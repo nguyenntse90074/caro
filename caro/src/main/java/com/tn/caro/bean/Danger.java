@@ -8,14 +8,14 @@ public class Danger implements Comparable<Danger> {
 	public static final int LEVEL_WHITE = 1;
 	public static final int LEVEL_NORMAL = 0;
 	
-	private Cell cell;
+	private Step step;
 	private int rate;
 	private int positionPriority;
 	private int level;
 	private int emptyHead;
 	
-	public Danger(Cell cell, int level, int rate, int positionPiority, int emptyHead) {
-		this.cell = cell;
+	public Danger(Step step, int level, int rate, int positionPiority, int emptyHead) {
+		this.step = step;
 		this.rate = rate;
 		this.level = level;
 		this.positionPriority = positionPiority;
@@ -32,12 +32,16 @@ public class Danger implements Comparable<Danger> {
 		return o.getEmptyHead() * o.getPositionPriority() - this.getEmptyHead() * this.getPositionPriority();
 	}
 	
+	public void addRate(int rate) {
+		this.rate += rate;
+	}
+	
 	public int getRate() {
 		return rate;
 	}
 	
-	public Cell getCell() {
-		return cell;
+	public Step getStep() {
+		return step;
 	}
 	
 	public int getLevel() {
@@ -62,7 +66,7 @@ public class Danger implements Comparable<Danger> {
 			return false;
 		}
 		
-		return cell.equals(((Danger)object).getCell());
+		return step.equals(((Danger)object).getStep());
 	}
 	
 	public void augmentRate(Danger oDanger) {
@@ -73,6 +77,6 @@ public class Danger implements Comparable<Danger> {
 	}
 	
 	public String getCellAddress() {
-		return cell.toString();
+		return step.toString();
 	}
 }

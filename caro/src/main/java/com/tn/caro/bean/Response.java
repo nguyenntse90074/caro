@@ -6,7 +6,7 @@ public class Response {
 	public static final int STATUS_ERR = 1;
 	
 	private Result result;
-	private Cell cell;
+	private Step step;
 	private int status;
 	private String message;
 	
@@ -19,16 +19,16 @@ public class Response {
 		this.result = result;
 	}
 	
-	public void setCell(Cell cell) {
-		this.cell = cell;
+	public void setStep(Step step) {
+		this.step = step;
 	}
 	
 	public Result getResult() {
 		return result;
 	}
 	
-	public Cell getCell() {
-		return cell;
+	public Step getStep() {
+		return step;
 	}
 	
 	public void setStatus(int status) {

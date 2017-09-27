@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tn.caro.bean.CaroTable;
 import com.tn.caro.bean.Response;
-import com.tn.caro.bean.Cell;
+import com.tn.caro.bean.Step;
 import com.tn.caro.manager.TableManager;
 import com.tn.caro.service.CaroService;
 
@@ -31,8 +31,8 @@ public class HomeController {
 	
 	@RequestMapping(value = "/add-user-step", method=RequestMethod.GET)
 	public ResponseEntity<Response> addUserStep(@RequestParam(required=true) Long tableId, 
-							@RequestParam(required=true) int x, 
-							@RequestParam(required=true) int y){
+							@RequestParam(required=true) short x, 
+							@RequestParam(required=true) short y){
 		Response response = new Response();
 		CaroTable caroTable = null;
 		if((caroTable = tableManager.getTableById(tableId)) == null || caroTable.isOutOfDate()) {
@@ -40,13 +40,13 @@ public class HomeController {
 			response.setMessage("This table's session is invalid, Refresh page?");
 			return new ResponseEntity<Response>(response, HttpStatus.OK);
 		}
-		Cell userCell = new Cell(x, y, Cell.CELL_VALUE_X);
-		caroTable.checkToCell(userCell);
-		response.setCell(userCell);
-		response.setResult(caroService.checkResult(userCell, caroTable));
+		Step userStep = new Step(x, y, Step.CELL_VALUE_X);
+		caroTable.checkToStep(userStep);
+		response.setStep(userStep);
+		response.setResult(caroService.checkResult(userStep, caroTable));
 		if(response.getResult().getIsWin()) {
 			tableManager.deleteTableById(tableId);
-			caroService.saveLostTable(caroTable);
+			//caroService.saveLostTable(caroTable);
 		}
 		return new ResponseEntity<Response>(response, HttpStatus.OK);
 	}
@@ -55,11 +55,11 @@ public class HomeController {
 	public ResponseEntity<Response> addStep(@RequestParam(required=true) Long tableId) {
 		Response response = new Response();
 		CaroTable caroTable = tableManager.getTableById(tableId);
-		Cell robotCell = caroService.findRobotStep(caroTable);
-		robotCell.setValue(Cell.CELL_VALUE_O);
-		caroTable.checkToCell(robotCell);
-		response.setCell(robotCell);
-		response.setResult(caroService.checkResult(robotCell, caroTable));
+		Step robotStep = caroService.findRobotStep(caroTable);
+		robotStep.setValue(Step.CELL_VALUE_O);
+		caroTable.checkToStep(robotStep);
+		response.setStep(robotStep);
+		response.setResult(caroService.checkResult(robotStep, caroTable));
 		if(response.getResult().getIsWin()) {
 			tableManager.deleteTableById(tableId);
 		}
