@@ -41,8 +41,6 @@ public class CaroTable {
 		lastUpdated = LocalDateTime.now();
 	}
 	
-
-	
 	public List<List<Step>> getAllRowHasValueAndCell(int value, Step step) {
 		List<List<Step>>allRows = new ArrayList<List<Step>>();
 		List<Step> stepsOfRow = null;
@@ -609,9 +607,9 @@ public class CaroTable {
 	}
 	
 	public void checkToStep(Step step) {
-		if(allStep[step.getY()][step.getX()].getValue() != 0) {
-			return;
-		}
+//		if(allStep[step.getY()][step.getX()].getValue() != 0) {
+//			return;
+//		}
 		allStep[step.getY()][step.getX()].setValue(step.getValue());
 		history.add(step);
 		if(history.size() == 1) {
@@ -636,6 +634,10 @@ public class CaroTable {
 	
 	public long getTableId() {
 		return tableId;
+	}
+	
+	public int getHistoryLength() {
+		return history.size();
 	}
 	
 	public void setTableId(long tableId) {
@@ -666,13 +668,14 @@ public class CaroTable {
 	}
 
 	public boolean isOutOfDate() {
-		return isFinished || LocalDateTime.now().until(lastUpdated, ChronoUnit.MINUTES) > 1;
+		System.out.println(lastUpdated.until(LocalDateTime.now(), ChronoUnit.MINUTES));
+		return isFinished || lastUpdated.until(LocalDateTime.now(), ChronoUnit.MINUTES) >= 1;
 	}
 
 	public String getTableData() {
 		StringBuilder dataBuilder = new StringBuilder();
 		for(Step step : history) {
-			dataBuilder.append(step.getX() - minX).append(COMMA).append(step.getY()-minY);
+			dataBuilder.append(step.toString());
 			dataBuilder.append("|");
 		}
 		return dataBuilder.deleteCharAt(dataBuilder.length()-1).toString();
@@ -680,18 +683,15 @@ public class CaroTable {
 	public String getTableDataBefore(int step) {
 		StringBuilder dataBuilder = new StringBuilder();
 		for(int i = 0; i < history.size() - step; i++){
-			dataBuilder.append(history.get(i).getX() - minX).append(COMMA).append(history.get(i).getY()-minY);
+			dataBuilder.append(history.get(i).toString());
 			dataBuilder.append("|");
 		}
 		return dataBuilder.deleteCharAt(dataBuilder.length()-1).toString();
 	}
 
-	public String getStepBefore(short stepIndex) {
+	public Step getStep(short stepIndex) {
 		if(stepIndex < history.size()) {
-			Step step = history.get(stepIndex);
-			step.addX((short)-minX);
-			step.addY((short)-minY);
-			return history.get(stepIndex).toString();
+			return history.get(history.size() - stepIndex);
 		}
 		return null;
 	}

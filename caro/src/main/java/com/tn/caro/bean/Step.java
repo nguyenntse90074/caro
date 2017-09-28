@@ -6,15 +6,26 @@ public class Step {
 	public static final byte CELL_VALUE_X = 1;
 	public static final byte CELL_VALUE_O = -1;
 	public static final byte CELL_VALUE_E = 0;
+	public static final byte TYPE_REQUIRED = 1;
+	public static final byte TYPE_NORMAL = -1;
+	
 	private short x;
 	private short y;
 	private short value;
-	private byte owner;
+	private byte type;
 	
 	public Step(short x, short y, byte value) {
 		this.x = x;
 		this.y = y;
 		this.value = value;
+		this.type = TYPE_NORMAL;
+	}
+	
+	public Step(short x, short y, byte value, byte type) {
+		this.x = x;
+		this.y = y;
+		this.value = value;
+		this.type = type;
 	}
 	
 	public Step(String cellAddress) {
@@ -53,12 +64,12 @@ public class Step {
 		this.y += y;
 	}
 	
-	public void setOwner(byte owner) {
-		this.owner = owner;
+	public void setType(byte type) {
+		this.type = type;
 	}
 	
-	public byte getOwner() {
-		return owner;
+	public byte getType() {
+		return type;
 	}
 	
 	public short getY() {

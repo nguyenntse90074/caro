@@ -5,10 +5,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.tn.caro.bean.CaroTable;
+import com.tn.caro.cronjob.CaroTableDeleter;
 
 public class TableManager {
 
 	private static Map<Long, CaroTable> allTables = new HashMap<Long, CaroTable>();
+	
+	public TableManager() {
+		Runnable tableDeleter = new CaroTableDeleter(allTables);
+		Thread tableDeleterThread = new Thread(tableDeleter);
+		tableDeleterThread.start();
+	}
 	
 	public long createdNewTable() {
 		long newId = gennerateTableId();
@@ -37,16 +44,6 @@ public class TableManager {
 	
 	public void deleteTableById(long id) {
 		allTables.remove(id);
-	}
-	
-	public void deleteOutOfDateTable() {
-		int i = 0;
-		for(CaroTable table : allTables.values()) {
-			if(table.isOutOfDate()) {
-				allTables.remove(table).getTableId();
-				i++;
-			}
-		}
 	}
 }
 

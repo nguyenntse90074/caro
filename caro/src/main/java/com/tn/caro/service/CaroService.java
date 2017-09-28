@@ -44,12 +44,10 @@ public class CaroService {
 		
 		List<Danger> allRobotRedDanger = findDangerByLevel(Danger.LEVEL_RED, allRobotDanger);
 		List<Danger> allRobotYellowDanger = findDangerByLevel(Danger.LEVEL_YELLOW, allRobotDanger);
-//		List<Danger> allRobotGreenDanger = findDangerByLevel(Danger.LEVEL_GREEN, allRobotDanger);
 		List<Danger> allRobotWhiteDanger = findDangerByLevel(Danger.LEVEL_WHITE, allRobotDanger);
 		
 		List<Danger> allUserRedDanger = findDangerByLevel(Danger.LEVEL_RED, allUserDanger);
 		List<Danger> allUserYellowDanger = findDangerByLevel(Danger.LEVEL_YELLOW, allUserDanger);
-//		List<Danger> allUserGreenDanger = findDangerByLevel(Danger.LEVEL_GREEN, allUserDanger);
 		List<Danger> allUserWhiteDanger = findDangerByLevel(Danger.LEVEL_WHITE, allUserDanger);
 		
 		if(!allRobotRedDanger.isEmpty()) {
@@ -69,18 +67,20 @@ public class CaroService {
 			Collections.sort(allUserRedDanger);
 			return allUserRedDanger.get(0).getStep();
 		}
-
-		if(allUserYellowDanger.size() >= 4 && !allRobotYellowDanger.isEmpty()) {
-			for(Danger userDanger : allUserYellowDanger) {
-				for(Danger robotDanger : allRobotYellowDanger) {
-					if(userDanger.equals(robotDanger)) {
-						userDanger.augmentRate(robotDanger);
+		if(!allRobotYellowDanger.isEmpty()) {
+			Danger dangerLv1;
+			for(int i = 0; i<allRobotYellowDanger.size(); i++) {
+				dangerLv1 = allRobotYellowDanger.get(i);
+				for(int j=0; j<allRobotYellowDanger.size(); j++) {
+					if(i != j && dangerLv1.equals(allRobotYellowDanger.get(j))) {
+						dangerLv1.augmentRate(allRobotYellowDanger.get(j));
 					}
 				}
 			}
-			Collections.sort(allUserYellowDanger);
-			return allUserYellowDanger.get(0).getStep();
+			Collections.sort(allRobotYellowDanger);
+			return allRobotYellowDanger.get(0).getStep();
 		}
+
 		if(allUserYellowDanger.size() >= 3) {
 			Danger dangerLv1;
 			for(int i = 0; i<allUserYellowDanger.size(); i++) {
@@ -124,29 +124,27 @@ public class CaroService {
 			return allRobotYellowDanger.get(0).getStep();
 		}
 		
-//		List<Cell> experienceCell = caroDAO.findNextStepByByTableData(caroTable.getTableData());
-//		if(!experienceCell.isEmpty()) {
-//			Cell bestCell = experienceCell.get(0);
-//			bestCell.setX(bestCell.getX()+caroTable.getMinX());
-//			bestCell.setY(bestCell.getY()+caroTable.getMinY());
-//			return bestCell;
-//		}
-
-		if(allRobotWhiteDanger.size()>=6) {
-			List<Danger> allContinueDanger = getMultiDimentionDanger(allRobotWhiteDanger);
-			if(!allContinueDanger.isEmpty()) {
-				for(int i = 0; i < allContinueDanger.size(); i++) {
-					for(int j=0; j<allContinueDanger.size(); j++) {
-						if(j == i) continue;
-						if(allContinueDanger.get(i).getStep().equals(allContinueDanger.get(j).getStep())) {
-							allContinueDanger.get(i).augmentRate(allContinueDanger.get(j));
-						}
-					}
-				}
-				Collections.sort(allContinueDanger);
-				return allContinueDanger.get(0).getStep();
-			}
+		List<Step> experienceCell = caroDAO.findNextStepByByTableData(caroTable.getTableData());
+		if(!experienceCell.isEmpty()) {
+			Step bestStep = experienceCell.get(0);
+			return bestStep;
 		}
+
+//		if(allRobotWhiteDanger.size()>=6) {
+//			List<Danger> allContinueDanger = getMultiDimentionDanger(allRobotWhiteDanger);
+//			if(!allContinueDanger.isEmpty()) {
+//				for(int i = 0; i < allContinueDanger.size(); i++) {
+//					for(int j=0; j<allContinueDanger.size(); j++) {
+//						if(j == i) continue;
+//						if(allContinueDanger.get(i).getStep().equals(allContinueDanger.get(j).getStep())) {
+//							allContinueDanger.get(i).augmentRate(allContinueDanger.get(j));
+//						}
+//					}
+//				}
+//				Collections.sort(allContinueDanger);
+//				return allContinueDanger.get(0).getStep();
+//			}
+//		}
 		
 		if(allUserWhiteDanger.size() >= 6) {
 			List<Danger> allMultiDimentionDanger = getMultiDimentionDanger(allUserWhiteDanger);
@@ -162,24 +160,24 @@ public class CaroService {
 				Collections.sort(allMultiDimentionDanger);
 				return allMultiDimentionDanger.get(0).getStep();
 			}
-		} else if(allUserWhiteDanger.size() > 2) {
+		} else if(allUserWhiteDanger.size() > 4 && allUserDanger.size() > 12) {
 			if(checkIfHasContinuousDanger(Step.CELL_VALUE_X, allUserWhiteDanger, caroTable)){
 				Collections.sort(allUserWhiteDanger);
 				return allUserWhiteDanger.get(0).getStep();
 			}
 		}
-		if(!allRobotDanger.isEmpty()) {
-			for(int i = 0; i < allRobotDanger.size(); i++) {
-				for(int j = 0; j<allRobotDanger.size(); j++) {
-					if(i==j) continue;
-					if(allRobotDanger.get(i).equals(allRobotDanger.get(j))) {
-						allRobotDanger.get(i).augmentRate(allRobotDanger.get(j));
-					}
-				}
-			}
-			Collections.sort(allRobotDanger);
-			return allRobotDanger.get(0).getStep();
-		}
+//		if(!allRobotDanger.isEmpty()) {
+//			for(int i = 0; i < allRobotDanger.size(); i++) {
+//				for(int j = 0; j<allRobotDanger.size(); j++) {
+//					if(i==j) continue;
+//					if(allRobotDanger.get(i).equals(allRobotDanger.get(j))) {
+//						allRobotDanger.get(i).augmentRate(allRobotDanger.get(j));
+//					}
+//				}
+//			}
+//			Collections.sort(allRobotDanger);
+//			return allRobotDanger.get(0).getStep();
+//		}
 
 		for(Danger userDanger : allUserDanger) {
 			for(Danger robotDanger : allRobotDanger) {
@@ -203,7 +201,7 @@ public class CaroService {
 				count++;
 			}
 		}
-		return count > 2;
+		return count > 3;
 	}
 	
 	private List<Danger> getMultiDimentionDanger(List<Danger> allDanger) {
@@ -291,6 +289,9 @@ public class CaroService {
 	private List<Danger> findDangerByLevel(int level ,List<Danger> allDanger) {
 		List<Danger> result = new ArrayList<Danger>();
 		for(Danger danger : allDanger) {
+			if(danger.getLevel() >= Danger.LEVEL_YELLOW) {
+				danger.getStep().setType(Step.TYPE_REQUIRED);
+			}
 			if(danger.getLevel() >= level) {
 				result.add(danger);
 			}

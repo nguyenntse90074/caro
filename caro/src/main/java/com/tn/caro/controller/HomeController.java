@@ -46,7 +46,7 @@ public class HomeController {
 		response.setResult(caroService.checkResult(userStep, caroTable));
 		if(response.getResult().getIsWin()) {
 			tableManager.deleteTableById(tableId);
-			//caroService.saveLostTable(caroTable);
+			caroService.saveLostTable(caroTable);
 		}
 		return new ResponseEntity<Response>(response, HttpStatus.OK);
 	}

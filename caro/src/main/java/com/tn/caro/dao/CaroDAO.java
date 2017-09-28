@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import com.tn.caro.bean.CaroTable;
 import com.tn.caro.bean.Step;
+import com.tn.caro.cronjob.RecordDataJob;
 
 @Repository
 public class CaroDAO {
@@ -24,19 +25,14 @@ public class CaroDAO {
 	}
 	
 	public void saveLostTable(CaroTable caroTable) {
-		String insertQuery = "CALL insert_caro_table(?, ?, ?, ?);";
 		StatelessSession session = sessionFactory.openStatelessSession(); 
-		SQLQuery query = session.createSQLQuery(insertQuery);
-		query.setString(0, caroTable.getTableDataBefore(6));
-		query.setString(1, caroTable.getStepBefore((short)6));
-		query.setInteger(2, 6);
-		query.setString(3, caroTable.getTableData());
-		query.executeUpdate();
-		session.close();
+		Runnable dataRecorder = new RecordDataJob(session, caroTable);
+		Thread dataRecordThreader = new Thread(dataRecorder);
+		dataRecordThreader.start();
 	}
 	
 	public List<Step> findNextStepByByTableData(String tableData) {
-		String selectQuery = "select next_step_1 from caro_table where table_data = ?;";
+		String selectQuery = "select next_user_step from caro_table where table_data = ?;";
 		StatelessSession session = sessionFactory.openStatelessSession(); 
 		SQLQuery query = session.createSQLQuery(selectQuery);
 		query.setString(0, tableData);
