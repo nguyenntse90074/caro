@@ -32,7 +32,7 @@ public class CaroDAO {
 	}
 	
 	public List<Step> findNextStepByByTableData(String tableData) {
-		String selectQuery = "select next_user_step from caro_table where table_data = ?;";
+		String selectQuery = "select next_user_step from caro_table where table_data = ? order by rate_robot_step;";
 		StatelessSession session = sessionFactory.openStatelessSession(); 
 		SQLQuery query = session.createSQLQuery(selectQuery);
 		query.setString(0, tableData);

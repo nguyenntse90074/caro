@@ -9,12 +9,12 @@ public class Danger implements Comparable<Danger> {
 	public static final int LEVEL_NORMAL = 0;
 	
 	private Step step;
-	private int rate;
-	private int positionPriority;
-	private int level;
-	private int emptyHead;
+	private byte rate;
+	private byte positionPriority;
+	private byte level;
+	private byte emptyHead;
 	
-	public Danger(Step step, int level, int rate, int positionPiority, int emptyHead) {
+	public Danger(Step step, byte level, byte rate, byte positionPiority, byte emptyHead) {
 		this.step = step;
 		this.rate = rate;
 		this.level = level;
@@ -48,7 +48,7 @@ public class Danger implements Comparable<Danger> {
 		return level;
 	}
 	
-	public void setLevel(int level) {
+	public void setLevel(byte level) {
 		this.level = level;
 	}
 	

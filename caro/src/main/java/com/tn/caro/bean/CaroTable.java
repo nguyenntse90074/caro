@@ -12,12 +12,15 @@ import javax.persistence.Table;
 @Table(name = "caro_table", schema="caro_data")
 public class CaroTable {
 	
-	public static final short ROW = 30;
-	public static final short COLLUMN = 30;
+	public static final byte ROW = 30;
+	public static final byte COLLUMN = 30;
 	public static final String COMMA = ",";
 	private long tableId;
-	private Step[][] allStep;
 	private List<Step> history;
+	private Row[] horizontal;
+	private Row[] vertical;
+	private Row[] diagonalDown;
+	private Row[] diagonalUp;
 	private boolean userTurns;
 	private short minX;
 	private short minY;
@@ -29,14 +32,20 @@ public class CaroTable {
 	public CaroTable() {
 		isFinished = false;
 		history = new ArrayList<Step>();
-		allStep = new Step[COLLUMN][ROW];
-		Step[] rowCell = null;
-		for(short y = 0; y < 30; y++) {
-			rowCell = new Step[30];
-			for(short x = 0; x< 30; x++) {
-				rowCell [x] = new Step(x, y);
-			}
-			allStep[y] = rowCell;
+		horizontal = new Row[ROW];
+		vertical = new Row[ROW];
+		diagonalDown = new Row[ROW*2-1];
+		diagonalUp = new Row[ROW*2-1];
+		for(byte x = 0; x < ROW; x++) {
+			horizontal[x] = new HorizontalRow(new Cell((byte)0, x), new Cell((byte)(ROW-1), x));
+			vertical[x] = new VerticalRow(new Cell(x, (byte)0), new Cell(x, (byte)(ROW-1)));
+			
+			diagonalUp[x] = new DiagonalUpRow(new Cell((byte)0, x), new Cell((byte)(ROW-1), (byte)(ROW-x-1)));
+			diagonalDown[x] = new DiagonalDownRow(new Cell(x, (byte)0), new Cell((byte)0, x));
+			
+			if(x == ROW - 1) break;
+			diagonalUp[ROW+x] = new DiagonalUpRow(new Cell((byte)0, (byte)(x+1)), new Cell((byte)(ROW-x-1), (byte)(ROW-1)));
+			diagonalDown[ROW+x] = new DiagonalDownRow(new Cell((byte)(ROW-1), (byte)(x + 1)), new Cell((byte)(x+1), (byte)(ROW-1)));
 		}
 		lastUpdated = LocalDateTime.now();
 	}
@@ -272,230 +281,8 @@ public class CaroTable {
 		return allRows; 
 	}
 	
-	public List<List<Step>> getAllRowByValue(int value) {
-		List<List<Step>>allRows = new ArrayList<List<Step>>();
-		List<Step> stepsOfRow = null;
-		List<Step> tailList = null;
-		boolean hasValue = false;
-		Step checkingStep;
-		for(int y = 0; y<allStep.length; y++) {
-			stepsOfRow = new ArrayList<Step>();
-			tailList = new ArrayList<Step>();
-			hasValue = false;
-			for(int x = 0; x<allStep[y].length; x++) {
-				checkingStep = allStep[y][x];
-				if(checkingStep.getValue() == 0) {
-					if(hasValue) {
-						tailList.add(checkingStep);
-					}
-					stepsOfRow.add(checkingStep);
-				} else if(checkingStep.getValue() == value) {
-					if(hasValue && tailList.size() > 1) {
-						allRows.add(stepsOfRow);
-						stepsOfRow = new ArrayList<Step>();
-						stepsOfRow.addAll(tailList);
-						tailList.clear();
-						hasValue = false;
-					} else {
-						stepsOfRow.add(checkingStep);
-						hasValue = true;
-						tailList.clear();
-					}
-				} 
-				if(checkingStep.getValue() == -value 
-						|| x == allStep[y].length - 1) {
-					if(hasValue) {
-						allRows.add(stepsOfRow);
-					}
-					hasValue = false;
-					tailList.clear();
-					stepsOfRow = new ArrayList<Step>();
-				}
-				
-			}
-		}
-		for(int x = 0; x<allStep[0].length; x++) {
-			stepsOfRow = new ArrayList<Step>();
-			tailList = new ArrayList<Step>();
-			hasValue = false;
-			for(int y = 0; y<allStep.length; y++) {
-				checkingStep = allStep[y][x];
-				if(checkingStep.getValue() == 0) {
-					if(hasValue) {
-						tailList.add(checkingStep);
-					}
-					stepsOfRow.add(checkingStep);
-				} else if(checkingStep.getValue() == value) {
-					if(hasValue && tailList.size() > 1) {
-						allRows.add(stepsOfRow);
-						stepsOfRow = new ArrayList<Step>();
-						stepsOfRow.addAll(tailList);
-						tailList.clear();
-						hasValue = false;
-					} else {
-						stepsOfRow.add(checkingStep);
-						hasValue = true;
-						tailList.clear();
-					}
-				} 
-				if(checkingStep.getValue() == -value 
-						|| y == allStep.length - 1) {
-					if(hasValue) {
-						allRows.add(stepsOfRow);
-					}
-					hasValue = false;
-					tailList.clear();
-					stepsOfRow = new ArrayList<Step>();
-				}
-			}
-		}
-		for(int i = 0; i < allStep.length; i++) {
-			stepsOfRow = new ArrayList<Step>();
-			tailList = new ArrayList<Step>();
-			hasValue = false;
-			for(int x = 0; x < allStep.length - i; x++) {
-				int y = x + i;
-				checkingStep = allStep[y][x];
-				if(checkingStep.getValue() == 0) {
-					if(hasValue) {
-						tailList.add(checkingStep);
-					}
-					stepsOfRow.add(checkingStep);
-				} else if(checkingStep.getValue() == value) {
-					if(hasValue && tailList.size() > 1) {
-						allRows.add(stepsOfRow);
-						stepsOfRow = new ArrayList<Step>();
-						stepsOfRow.addAll(tailList);
-						tailList.clear();
-						hasValue = false;
-					} else {
-						stepsOfRow.add(checkingStep);
-						hasValue = true;
-						tailList.clear();
-					}
-				} 
-				if(checkingStep.getValue() == -value 
-						|| x == allStep[y].length - i - 1) {
-					if(hasValue) {
-						allRows.add(stepsOfRow);
-					}
-					hasValue = false;
-					tailList.clear();
-					stepsOfRow = new ArrayList<Step>();
-				}
-			}
-		}
-		for(int i = 1; i < allStep.length; i++) {
-			stepsOfRow = new ArrayList<Step>();
-			tailList = new ArrayList<Step>();
-			hasValue = false;
-			for(int x = i; x < allStep.length; x++) {
-				int y = x - i;
-				checkingStep = allStep[y][x];
-				if(checkingStep.getValue() == 0) {
-					if(hasValue) {
-						tailList.add(checkingStep);
-					}
-					stepsOfRow.add(checkingStep);
-				} else if(checkingStep.getValue() == value) {
-					if(hasValue && tailList.size() > 1) {
-						allRows.add(stepsOfRow);
-						stepsOfRow = new ArrayList<Step>();
-						stepsOfRow.addAll(tailList);
-						tailList.clear();
-						hasValue = false;
-					} else {
-						stepsOfRow.add(checkingStep);
-						hasValue = true;
-						tailList.clear();
-					}
-				} 
-				if(checkingStep.getValue() == -value 
-						|| x == allStep.length - 1) {
-					if(hasValue) {
-						allRows.add(stepsOfRow);
-					}
-					hasValue = false;
-					tailList.clear();
-					stepsOfRow = new ArrayList<Step>();
-				}
-			}
-		}
-		for(int i = 0; i < allStep.length; i++) {
-			stepsOfRow = new ArrayList<Step>();
-			tailList = new ArrayList<Step>();
-			hasValue = false;
-			for(int x = 0; x <= i; x++) {
-				int y = -x + i;
-				checkingStep = allStep[y][x];
-				if(checkingStep.getValue() == 0) {
-					if(hasValue) {
-						tailList.add(checkingStep);
-					}
-					stepsOfRow.add(checkingStep);
-				} else if(checkingStep.getValue() == value) {
-					if(hasValue && tailList.size() > 1) {
-						allRows.add(stepsOfRow);
-						stepsOfRow = new ArrayList<Step>();
-						stepsOfRow.addAll(tailList);
-						tailList.clear();
-						hasValue = false;
-					} else {
-						stepsOfRow.add(checkingStep);
-						hasValue = true;
-						tailList.clear();
-					}
-				} 
-				if(checkingStep.getValue() == -value 
-						|| x == i) {
-					if(hasValue) {
-						allRows.add(stepsOfRow);
-					}
-					hasValue = false;
-					tailList.clear();
-					stepsOfRow = new ArrayList<Step>();
-				}
-			}
-		}
+	public void remapTable(Step newStep) {
 		
-		for(int i = allStep.length; i < allStep.length * 2; i++) {
-			stepsOfRow = new ArrayList<Step>();
-			tailList = new ArrayList<Step>();
-			hasValue = false;
-			for(int x = i - allStep.length + 1; x < allStep.length; x++) {
-				int y = -x + i;
-				checkingStep = allStep[y][x];
-				if(checkingStep.getValue() == 0) {
-					if(hasValue) {
-						tailList.add(checkingStep);
-					}
-					stepsOfRow.add(checkingStep);
-				} else if(checkingStep.getValue() == value) {
-					if(hasValue && tailList.size() > 1) {
-						allRows.add(stepsOfRow);
-						stepsOfRow = new ArrayList<Step>();
-						stepsOfRow.addAll(tailList);
-						tailList.clear();
-						hasValue = false;
-					} else {
-						stepsOfRow.add(checkingStep);
-						hasValue = true;
-						tailList.clear();
-					}
-				} 
-				if(checkingStep.getValue() == -value 
-						|| x == allStep.length - 1) {
-					if(hasValue) {
-						allRows.add(stepsOfRow);
-					}
-					hasValue = false;
-					tailList.clear();
-					stepsOfRow = new ArrayList<Step>();
-				}
-			}
-		}
-		
-		return allRows; 
 	}
 	
 	public Step getLastestStep() {
@@ -506,129 +293,43 @@ public class CaroTable {
 	}
 	
 	public List<Step> findWinRowsByStep(Step step) {
-		List<Step> winRow = new ArrayList<Step>();
-		winRow.add(step);
-		for(int index = step.getX()+1; index < allStep[step.getY()].length; index++) {
-			if(allStep[step.getY()][index].getValue() == step.getValue()) {
-				winRow.add(allStep[step.getY()][index]);
-				if(winRow.size() >= 5) {
-					isFinished = true;
-					return winRow;
-				}
-			} else {
-				break;
-			}
-		}
-		for(int index = step.getX()-1; index >=0; index--) {
-			if(allStep[step.getY()][index].getValue() == step.getValue()) {
-				winRow.add(allStep[step.getY()][index]);
-				if(winRow.size() >= 5) {
-					isFinished = true;
-					return winRow;
-				}
-			} else {
-				break;
-			}
-		}
-		winRow.clear();
-		winRow.add(step);
-		for(int index = step.getY()+1; index < allStep.length; index++) {
-			if(allStep[index][step.getX()].getValue() == step.getValue()) {
-				winRow.add(allStep[index][step.getX()]);
-				if(winRow.size() >= 5) {
-					isFinished = true;
-					return winRow;
-				}
-			} else {
-				break;
-			}
-		}
-		for(int index = step.getY()-1; index >=0; index--) {
-			if(allStep[index][step.getX()].getValue() == step.getValue()) {
-				winRow.add(allStep[index][step.getX()]);
-				if(winRow.size() >= 5) {
-					isFinished = true;
-					return winRow;
-				}
-			} else {
-				break;
-			}
-		}
-		winRow.clear();
-		winRow.add(step);
-		for(int indexX = step.getX()+1, indexY = step.getY()+1; indexX < allStep.length && indexY < allStep.length; indexX++, indexY++) {
-			if(allStep[indexY][indexX].getValue() == step.getValue()) {
-				winRow.add(allStep[indexY][indexX]);
-				if(winRow.size() >= 5) {
-					isFinished = true;
-					return winRow;
-				}
-			} else {
-				break;
-			}
-		}
-		for(int indexX = step.getX()-1, indexY = step.getY()-1; indexX >= 0 && indexY >= 0; indexX--, indexY--) {
-			if(allStep[indexY][indexX].getValue() == step.getValue()) {
-				winRow.add(allStep[indexY][indexX]);
-				if(winRow.size() >= 5) {
-					isFinished = true;
-					return winRow;
-				}
-			} else {
-				break;
-			}
-		}
-		winRow.clear();
-		winRow.add(step);
-		for(int indexX = step.getX()-1, indexY = step.getY()+1; indexX >= 0 && indexY < allStep.length; indexX--, indexY++) {
-			if(allStep[indexY][indexX].getValue() == step.getValue()) {
-				winRow.add(allStep[indexY][indexX]);
-				if(winRow.size() >= 5) {
-					isFinished = true;
-					return winRow;
-				}
-			} else {
-				break;
-			}
-		}
-		for(int indexX = step.getX()+1, indexY = step.getY()-1; indexX < allStep.length && indexY >= 0; indexX++, indexY--) {
-			if(allStep[indexY][indexX].getValue() == step.getValue()) {
-				winRow.add(allStep[indexY][indexX]);
-				if(winRow.size() >= 5) {
-					isFinished = true;
-					return winRow;
-				}
-			} else {
-				break;
-			}
-		}
-		winRow.clear();
-		return winRow;
+		Row horizontalRow = getHorizontalByCell(step.getCell());
+		List<Step> result = horizontalRow.findWinStep(step.getValue());
+		if(result != null) return result;
 	}
 	
+	public Row getHorizontalByCell(Cell cell) {
+		return horizontal[cell.getY()];
+	}
+	
+	public Row getVerticalByCell(Cell cell) {
+		return vertical[cell.getX()];
+	}
+	
+	public Row getDiagonalUpByCell(Cell cell) {
+		if(cell.getX() >= cell.getY()) {
+			return diagonalUp[cell.getX()];
+		} else {
+			return diagonalUp[ROW + cell.getX() - 1];
+		}
+	}
+	
+	public Row getDiagonalDownByCell(Cell cell) {
+		if(cell.getX() + cell.getY() >= ROW - 1) {
+			return diagonalDown[cell.getX()];
+		} else {
+			return diagonalDown[ROW + cell.getX() - 1];
+		}
+	}
 	public void checkToStep(Step step) {
-//		if(allStep[step.getY()][step.getX()].getValue() != 0) {
-//			return;
-//		}
-		allStep[step.getY()][step.getX()].setValue(step.getValue());
 		history.add(step);
 		if(history.size() == 1) {
-			minX = step.getX();
-			maxX = step.getX();
-			minY = step.getY();
-			maxY = step.getY();
 			return;
 		}
-		if(step.getX() < minX) {
-			minX = step.getX();
-		} else if(step.getX() > maxX) {
-			maxX = step.getX();
-		}
-		if(step.getY() < minY) {
-			minY = step.getY();
-		} else if(step.getY() > maxY) {
-			maxY = step.getY();
-		}
+		getHorizontalByCell(step.getCell()).addNewStep(step);
+		getVerticalByCell(step.getCell()).addNewStep(step);
+		getDiagonalDownByCell(step.getCell()).addNewStep(step);
+		getDiagonalUpByCell(step.getCell()).addNewStep(step);
 		lastUpdated = LocalDateTime.now();
 	}
 	
@@ -662,9 +363,6 @@ public class CaroTable {
 	
 	public int getMinY() {
 		return minY;
-	}
-	public Step[][] getAllStep() {
-		return allStep;
 	}
 
 	public boolean isOutOfDate() {

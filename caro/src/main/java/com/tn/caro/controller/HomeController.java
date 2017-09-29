@@ -31,8 +31,8 @@ public class HomeController {
 	
 	@RequestMapping(value = "/add-user-step", method=RequestMethod.GET)
 	public ResponseEntity<Response> addUserStep(@RequestParam(required=true) Long tableId, 
-							@RequestParam(required=true) short x, 
-							@RequestParam(required=true) short y){
+							@RequestParam(required=true) byte x, 
+							@RequestParam(required=true) byte y){
 		Response response = new Response();
 		CaroTable caroTable = null;
 		if((caroTable = tableManager.getTableById(tableId)) == null || caroTable.isOutOfDate()) {

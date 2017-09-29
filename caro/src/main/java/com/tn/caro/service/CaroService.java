@@ -312,11 +312,8 @@ public class CaroService {
 	
 	private List<Danger> findDangerSteps(List<Step> allStepsOfRow) {
 		List<Danger> allDangerCell = new ArrayList<Danger>();
-//		if(allCellsOfRow.size() < 5) {
-//			return allDangerCell;
-//		}
-		int leftPosition = 0;
-		int rightPosition = 0;
+		byte leftPosition = 0;
+		byte rightPosition = 0;
 		for(int i = 0; i < allStepsOfRow.size(); i++) {
 			if(allStepsOfRow.get(i).getValue() != Step.CELL_VALUE_E) {
 				break;
@@ -329,33 +326,33 @@ public class CaroService {
 			}
 			++rightPosition;
 		}
-		int checkedNode = 0;
+		byte checkedNode = 0;
 		for(int i = leftPosition; i< allStepsOfRow.size() - rightPosition; i++) {
 			if(allStepsOfRow.get(i).getValue() != Step.CELL_VALUE_E) {
 				checkedNode++;
 			}
 		}
-		int leftPiority = 2;
-		int rightPiority = 2;
-		int centerPiority = 2;
-		int emptyHead = 0;
+		byte leftPiority = 2;
+		byte rightPiority = 2;
+		byte centerPiority = 2;
+		byte emptyHead = 0;
 		if(leftPosition > 0) {
 			emptyHead++;
 		}
 		if(rightPosition > 0) {
 			emptyHead++;
 		}
-		int rowLength = allStepsOfRow.size() - leftPosition - rightPosition;
+		byte rowLength = (byte) (allStepsOfRow.size() - leftPosition - rightPosition);
 		if(rowLength - checkedNode == 1) {
 			centerPiority += 10;
 		}
-		int dangerLevel = Danger.LEVEL_NORMAL;
-		int dangerRate = checkedNode;
+		byte dangerLevel = Danger.LEVEL_NORMAL;
+		byte dangerRate = checkedNode;
 		if((checkedNode >= 4 && rowLength - checkedNode <= 1)
 				|| (checkedNode == 4 && leftPosition + rightPosition > 0 && rowLength <= 5)) {
 			dangerLevel = Danger.LEVEL_RED;
 			if(rowLength - checkedNode == 1) {
-				centerPiority = 999999;
+				centerPiority = 100;
 				for(int i = leftPosition; i < leftPosition + rowLength; i++) {
 					if(allStepsOfRow.get(i).getValue() == Step.CELL_VALUE_E) {
 						allDangerCell.add(new Danger(allStepsOfRow.get(i),dangerLevel, dangerRate, centerPiority, emptyHead));
@@ -392,15 +389,15 @@ public class CaroService {
 			leftPiority = 2;
 			rightPiority = 2;
 		}
-		for(int i = 0; i < leftPosition && i<limitted; i++) {
-			allDangerCell.add(new Danger(allStepsOfRow.get(leftPosition-i-1),dangerLevel, dangerRate, (leftPiority - i)*emptyHead, emptyHead));
+		for(byte i = 0; i < leftPosition && i<limitted; i++) {
+			allDangerCell.add(new Danger(allStepsOfRow.get(leftPosition-i-1),dangerLevel, dangerRate, (byte)((leftPiority - i)*emptyHead), emptyHead));
 		}
-		for(int i = 0; i < rightPosition && i<limitted; i++) {
-			allDangerCell.add(new Danger(allStepsOfRow.get(leftPosition+rowLength+i),dangerLevel, dangerRate, (rightPiority - i)*emptyHead, emptyHead));
+		for(byte i = 0; i < rightPosition && i<limitted; i++) {
+			allDangerCell.add(new Danger(allStepsOfRow.get(leftPosition+rowLength+i),dangerLevel, dangerRate, (byte)((rightPiority - i)*emptyHead), emptyHead));
 		}
-		for(int i = leftPosition; i < leftPosition + rowLength; i++) {
+		for(byte i = leftPosition; i < leftPosition + rowLength; i++) {
 			if(allStepsOfRow.get(i).getValue() == Step.CELL_VALUE_E) {
-				allDangerCell.add(new Danger(allStepsOfRow.get(i),dangerLevel, dangerRate, centerPiority*emptyHead, emptyHead));
+				allDangerCell.add(new Danger(allStepsOfRow.get(i),dangerLevel, dangerRate, (byte)(centerPiority*emptyHead), emptyHead));
 			}
 		}
 		return allDangerCell;

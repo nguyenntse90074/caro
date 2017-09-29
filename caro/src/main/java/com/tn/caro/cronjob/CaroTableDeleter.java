@@ -3,7 +3,6 @@ package com.tn.caro.cronjob;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.tn.caro.bean.CaroTable;
 
@@ -26,7 +25,6 @@ public class CaroTableDeleter implements Runnable {
 	}
 	public void deleteOutOfDateTable() {
 		if(allTables.values().isEmpty()) return;
-		int index = 0;
 		List<Long> allOutOfDateIndex = new ArrayList<Long>();
 		for(CaroTable table : allTables.values()) {
 			if(table.isOutOfDate()) {
@@ -36,6 +34,5 @@ public class CaroTableDeleter implements Runnable {
 		for(Long id : allOutOfDateIndex) {
 			allTables.remove(id);
 		}
-		System.out.println("deleted " + allOutOfDateIndex.size());
 	}
 }
